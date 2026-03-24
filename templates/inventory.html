@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventory | StockLedger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg:#0d0f14; --bg2:#13161e; --bg3:#1a1e2a;
+    --border:#252a38; --border2:#2e3449;
+    --text:#e8eaf0; --muted:#7a8199;
+    --accent:#f0a500; --accent2:#f7c948;
+    --danger:#e05c5c; --success:#3fcb7f;
+    --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+    --radius:10px; --radius-lg:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:15px; line-height:1.6; min-height:100vh; }
+.nav { position:sticky; top:0; z-index:100; background:var(--bg2); border-bottom:1px solid var(--border); padding:0 32px; display:flex; align-items:center; justify-content:space-between; height:60px; }
+.nav-brand { font-size:16px; font-weight:600; color:var(--accent); letter-spacing:.02em; display:flex; align-items:center; gap:8px; }
+.nav-links { display:flex; align-items:center; gap:4px; }
+.nav-links a { color:var(--muted); text-decoration:none; font-size:14px; padding:6px 14px; border-radius:8px; transition:all .18s; }
+.nav-links a:hover,.nav-links a.active { color:var(--text); background:var(--bg3); }
+.nav-links .logout { color:var(--danger); border:1px solid color-mix(in srgb,var(--danger) 25%,transparent); margin-left:8px; }
+.nav-links .logout:hover { background:color-mix(in srgb,var(--danger) 12%,transparent); }
+.page { max-width:1280px; margin:0 auto; padding:40px 32px; animation:rise .35s ease both; }
+@keyframes rise { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+.page-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
+.page-header h1 { font-size:24px; font-weight:600; }
+.btn { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:var(--radius); border:none; font-family:var(--font); font-size:14px; font-weight:500; cursor:pointer; text-decoration:none; transition:all .18s; }
+.btn-primary { background:var(--accent); color:#0d0f14; }
+.btn-primary:hover { background:var(--accent2); transform:translateY(-1px); }
+.btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border2); }
+.btn-ghost:hover { color:var(--text); border-color:var(--muted); background:var(--bg3); }
+.table-wrap { overflow-x:auto; border-radius:var(--radius-lg); border:1px solid var(--border); background:var(--bg2); }
+table { width:100%; border-collapse:collapse; }
+thead tr { border-bottom:1px solid var(--border); }
+thead th { padding:13px 16px; font-size:11px; font-weight:500; color:var(--muted); text-transform:uppercase; letter-spacing:.07em; text-align:left; white-space:nowrap; }
+tbody tr { border-bottom:1px solid var(--border); transition:background .15s; }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:var(--bg3); }
+tbody tr.low-stock { border-left:2px solid var(--danger); }
+tbody td { padding:14px 16px; font-size:14px; color:var(--text); }
+.mono { font-family:var(--mono); font-size:13px; }
+.badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:500; }
+.badge-low  { background:color-mix(in srgb,var(--danger) 14%,transparent); border:1px solid color-mix(in srgb,var(--danger) 28%,transparent); color:var(--danger); }
+.badge-ok   { background:color-mix(in srgb,var(--success) 14%,transparent); border:1px solid color-mix(in srgb,var(--success) 28%,transparent); color:var(--success); }
+.actions { display:flex; gap:6px; }
+.action-link { font-size:13px; color:var(--muted); text-decoration:none; padding:5px 10px; border-radius:7px; border:1px solid transparent; transition:all .15s; }
+.action-link:hover { color:var(--accent); border-color:color-mix(in srgb,var(--accent) 30%,transparent); background:color-mix(in srgb,var(--accent) 8%,transparent); }
+.action-link.del:hover { color:var(--danger); border-color:color-mix(in srgb,var(--danger) 30%,transparent); background:color-mix(in srgb,var(--danger) 8%,transparent); }
+.empty-row td { text-align:center; padding:60px; color:var(--muted); font-size:14px; }
+footer { text-align:center; color:var(--muted); font-size:13px; padding:40px 0 24px; }
+</style>
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-brand">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".25"/></svg>
+        StockLedger
+    </div>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('products') }}" class="active">Products</a>
+        <a href="{{ url_for('add_product') }}">Add Product</a>
+        <a href="{{ url_for('sell_product') }}">Sell</a>
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    </div>
+</nav>
+
+<div class="page">
+    <div class="page-header">
+        <h1>Inventory</h1>
+        <div style="display:flex;gap:12px;">
+            <a href="{{ url_for('add_product') }}" class="btn btn-primary">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                Add Product
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">Dashboard</a>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th><th>Name</th><th>Category</th>
+                    <th>Quantity</th><th>Min Stock</th>
+                    <th>Purchase ₹</th><th>Selling ₹</th>
+                    <th>Unit</th><th>Status</th><th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if products %}
+                    {% for p in products %}
+                    <tr {% if p.quantity <= p.min_stock %}class="low-stock"{% endif %}>
+                        <td class="mono" style="color:var(--muted);">{{ p.id }}</td>
+                        <td style="font-weight:500;">{{ p.name }}</td>
+                        <td style="color:var(--muted);">{{ p.category }}</td>
+                        <td class="mono">{{ p.quantity }}</td>
+                        <td class="mono" style="color:var(--muted);">{{ p.min_stock }}</td>
+                        <td class="mono">₹{{ p.purchase_price }}</td>
+                        <td class="mono" style="color:var(--accent);">₹{{ p.selling_price }}</td>
+                        <td>{{ p.unit_type }}</td>
+                        <td>
+                            {% if p.quantity <= p.min_stock %}
+                                <span class="badge badge-low">Low stock</span>
+                            {% else %}
+                                <span class="badge badge-ok">In stock</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <a href="{{ url_for('edit_product', id=p.id) }}" class="action-link">Edit</a>
+                                <a href="{{ url_for('delete_product', id=p.id) }}" class="action-link del"
+                                   onclick="return confirm('Delete this product?')">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr class="empty-row"><td colspan="10">No products in inventory</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<footer>StockLedger © 2026</footer>
+</body>
+</html>

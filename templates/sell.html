@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sell Product | StockLedger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg:#0d0f14; --bg2:#13161e; --bg3:#1a1e2a;
+    --border:#252a38; --border2:#2e3449;
+    --text:#e8eaf0; --muted:#7a8199;
+    --accent:#f0a500; --accent2:#f7c948;
+    --danger:#e05c5c; --success:#3fcb7f;
+    --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+    --radius:10px; --radius-lg:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:15px; line-height:1.6; min-height:100vh; }
+.nav { position:sticky; top:0; z-index:100; background:var(--bg2); border-bottom:1px solid var(--border); padding:0 32px; display:flex; align-items:center; justify-content:space-between; height:60px; }
+.nav-brand { font-size:16px; font-weight:600; color:var(--accent); letter-spacing:.02em; display:flex; align-items:center; gap:8px; }
+.nav-links { display:flex; align-items:center; gap:4px; }
+.nav-links a { color:var(--muted); text-decoration:none; font-size:14px; padding:6px 14px; border-radius:8px; transition:all .18s; }
+.nav-links a:hover,.nav-links a.active { color:var(--text); background:var(--bg3); }
+.nav-links .logout { color:var(--danger); border:1px solid color-mix(in srgb,var(--danger) 25%,transparent); margin-left:8px; }
+.nav-links .logout:hover { background:color-mix(in srgb,var(--danger) 12%,transparent); }
+.page { max-width:640px; margin:0 auto; padding:40px 32px; animation:rise .35s ease both; }
+@keyframes rise { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+
+.flashes { margin-bottom:20px; }
+.flash { padding:12px 18px; border-radius:var(--radius); font-size:14px; margin-bottom:8px; }
+.flash.error { background:color-mix(in srgb,var(--danger) 14%,transparent); border:1px solid color-mix(in srgb,var(--danger) 28%,transparent); color:var(--danger); }
+
+.page-heading { font-size:24px; font-weight:600; margin-bottom:6px; }
+.page-sub { font-size:14px; color:var(--muted); margin-bottom:28px; font-weight:300; }
+
+.card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
+.card-body { padding:28px; }
+
+.form-group { margin-bottom:20px; }
+label { display:block; font-size:12px; font-weight:500; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; margin-bottom:7px; }
+select, input {
+    width:100%; padding:11px 14px; background:var(--bg3); border:1px solid var(--border2);
+    border-radius:var(--radius); color:var(--text); font-family:var(--font); font-size:14px;
+    transition:border-color .18s, box-shadow .18s;
+}
+select:focus, input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent); }
+select option { background:var(--bg2); }
+.stock-hint { font-size:12px; color:var(--muted); margin-top:6px; }
+.stock-hint span { color:var(--accent); font-family:var(--mono); }
+
+/* SUMMARY PANEL */
+.summary {
+    background:var(--bg3); border:1px solid var(--border2); border-radius:var(--radius-lg);
+    padding:22px; margin:24px 0; display:none;
+}
+.summary.visible { display:block; }
+.summary-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); }
+.summary-row:last-child { border-bottom:none; padding-bottom:0; }
+.summary-row:first-child { padding-top:0; }
+.s-label { font-size:13px; color:var(--muted); }
+.s-value { font-family:var(--mono); font-size:15px; font-weight:500; }
+.s-value.accent  { color:var(--accent); }
+.s-value.success { color:var(--success); font-size:18px; }
+.s-value.danger  { color:var(--danger); }
+
+.btn-submit {
+    width:100%; padding:13px; background:var(--accent); color:#0d0f14;
+    border:none; border-radius:var(--radius); font-family:var(--font);
+    font-size:15px; font-weight:600; cursor:pointer; transition:all .18s;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-submit:hover { background:var(--accent2); transform:translateY(-1px); }
+.btn-submit:disabled { background:var(--border2); color:var(--muted); cursor:not-allowed; transform:none; }
+footer { text-align:center; color:var(--muted); font-size:13px; padding:40px 0 24px; }
+</style>
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-brand">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".25"/></svg>
+        StockLedger
+    </div>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('products') }}">Products</a>
+        <a href="{{ url_for('sell_product') }}" class="active">Sell</a>
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    </div>
+</nav>
+
+<div class="page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="flashes">{% for c,m in messages %}<div class="flash {{c}}">{{m}}</div>{% endfor %}</div>{% endif %}
+    {% endwith %}
+
+    <h1 class="page-heading">Record Sale</h1>
+    <p class="page-sub">Select a product and enter quantity to log a sale</p>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" id="sellForm">
+                <div class="form-group">
+                    <label>Product</label>
+                    <select name="product_id" id="productSelect" required>
+                        <option value="">— Select a product —</option>
+                        {% for product in products %}
+                        <option
+                            value="{{ product.id }}"
+                            data-price="{{ product.selling_price }}"
+                            data-purchase="{{ product.purchase_price }}"
+                            data-stock="{{ product.quantity }}"
+                            data-unit="{{ product.unit }}"
+                        >{{ product.name }} — ₹{{ product.selling_price }} ({{ product.quantity }} in stock)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" step="0.01" min="0.01" name="quantity" id="qtyInput" placeholder="0" required>
+                    <div class="stock-hint" id="stockHint" style="display:none;">Available stock: <span id="stockVal">—</span></div>
+                </div>
+
+                <div class="summary" id="summary">
+                    <div class="summary-row">
+                        <span class="s-label">Rate per unit</span>
+                        <span class="s-value" id="sRate">₹0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="s-label">Quantity</span>
+                        <span class="s-value" id="sQty">0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="s-label">Total amount</span>
+                        <span class="s-value accent" id="sTotal">₹0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="s-label">Estimated profit</span>
+                        <span class="s-value success" id="sProfit">₹0.00</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn" disabled>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Confirm Sale
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<footer>StockLedger © 2026</footer>
+
+<script>
+const sel = document.getElementById('productSelect');
+const qty = document.getElementById('qtyInput');
+const summary = document.getElementById('summary');
+const stockHint = document.getElementById('stockHint');
+const stockVal = document.getElementById('stockVal');
+const submitBtn = document.getElementById('submitBtn');
+
+function update(){
+    const opt = sel.options[sel.selectedIndex];
+    if(!opt || !opt.dataset.price){ summary.classList.remove('visible'); stockHint.style.display='none'; submitBtn.disabled=true; return; }
+    const price = parseFloat(opt.dataset.price);
+    const purchase = parseFloat(opt.dataset.purchase);
+    const stock = parseFloat(opt.dataset.stock);
+    const unit = opt.dataset.unit;
+    const q = parseFloat(qty.value)||0;
+    stockHint.style.display = 'block';
+    stockVal.textContent = stock + ' ' + unit;
+    if(q > stock){ qty.value = stock; return update(); }
+    if(q <= 0){ summary.classList.remove('visible'); submitBtn.disabled=true; return; }
+    const total = q * price;
+    const profit = q * (price - purchase);
+    document.getElementById('sRate').textContent  = '₹' + price.toFixed(2);
+    document.getElementById('sQty').textContent   = q;
+    document.getElementById('sTotal').textContent = '₹' + total.toFixed(2);
+    const sp = document.getElementById('sProfit');
+    sp.textContent = '₹' + profit.toFixed(2);
+    sp.className = 's-value ' + (profit >= 0 ? 'success' : 'danger');
+    summary.classList.add('visible');
+    submitBtn.disabled = false;
+}
+sel.addEventListener('change', update);
+qty.addEventListener('input', update);
+</script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | StockLedger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg:#0d0f14; --bg2:#13161e; --bg3:#1a1e2a;
+    --border:#252a38; --border2:#2e3449;
+    --text:#e8eaf0; --muted:#7a8199;
+    --accent:#f0a500; --accent2:#f7c948;
+    --danger:#e05c5c; --success:#3fcb7f; --info:#5b8dee;
+    --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+    --radius:10px; --radius-lg:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:15px; line-height:1.6; min-height:100vh; }
+.nav {
+    position:sticky; top:0; z-index:100; background:var(--bg2);
+    border-bottom:1px solid var(--border); padding:0 32px;
+    display:flex; align-items:center; justify-content:space-between; height:60px;
+}
+.nav-brand { font-size:16px; font-weight:600; color:var(--accent); letter-spacing:.02em; display:flex; align-items:center; gap:8px; }
+.nav-links { display:flex; align-items:center; gap:4px; }
+.nav-links a { color:var(--muted); text-decoration:none; font-size:14px; padding:6px 14px; border-radius:8px; transition:all .18s; }
+.nav-links a:hover, .nav-links a.active { color:var(--text); background:var(--bg3); }
+.nav-links .logout { color:var(--danger); border:1px solid color-mix(in srgb,var(--danger) 25%,transparent); margin-left:8px; }
+.nav-links .logout:hover { background:color-mix(in srgb,var(--danger) 12%,transparent); }
+.page { max-width:1280px; margin:0 auto; padding:40px 32px; animation:rise .35s ease both; }
+@keyframes rise { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+
+/* PAGE HEADER */
+.page-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:32px; }
+.page-header h1 { font-size:26px; font-weight:600; }
+.page-header .sub { font-size:14px; color:var(--muted); margin-top:3px; font-weight:300; }
+.chip { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; background:var(--bg2); border:1px solid var(--border2); font-size:13px; color:var(--muted); }
+.chip-dot { width:7px; height:7px; border-radius:50%; background:var(--success); animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+
+/* STAT GRID */
+.stat-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:28px; }
+@media(max-width:1100px){ .stat-grid{grid-template-columns:repeat(3,1fr);} }
+@media(max-width:700px){ .stat-grid{grid-template-columns:1fr 1fr;} }
+.stat-card {
+    background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px 20px;
+    transition:border-color .2s, transform .2s; cursor:default;
+    position:relative; overflow:hidden;
+}
+.stat-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, var(--card-accent,var(--border)), transparent);
+    opacity:0; transition:.2s;
+}
+.stat-card:hover { border-color:var(--border2); transform:translateY(-2px); }
+.stat-card:hover::before { opacity:1; }
+.stat-card .label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; font-weight:500; margin-bottom:14px; }
+.stat-card .value { font-size:28px; font-weight:600; font-family:var(--mono); color:var(--text); line-height:1; }
+.stat-card .value.accent { color:var(--accent); }
+.stat-card .value.success { color:var(--success); }
+.stat-card .value.danger  { color:var(--danger); }
+.stat-card .value.info    { color:var(--info); }
+
+/* TWO-COL LAYOUT */
+.dashboard-body { display:grid; grid-template-columns:1fr 380px; gap:24px; }
+@media(max-width:1000px){ .dashboard-body{grid-template-columns:1fr;} }
+
+.card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); }
+.card-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.card-title { font-size:14px; font-weight:500; }
+.card-body { padding:0; }
+
+/* ALERTS */
+.alert-item { padding:14px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; transition:background .15s; }
+.alert-item:last-child { border-bottom:none; }
+.alert-item:hover { background:var(--bg3); }
+.alert-name { font-size:14px; font-weight:500; }
+.alert-detail { font-size:12px; color:var(--muted); margin-top:2px; }
+.badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:500; font-family:var(--mono); }
+.badge-low  { background:color-mix(in srgb,var(--danger) 14%,transparent); border:1px solid color-mix(in srgb,var(--danger) 28%,transparent); color:var(--danger); }
+.badge-ok   { background:color-mix(in srgb,var(--success) 14%,transparent); border:1px solid color-mix(in srgb,var(--success) 28%,transparent); color:var(--success); }
+.empty-state { padding:48px 24px; text-align:center; color:var(--muted); font-size:14px; }
+
+/* QUICK ACTIONS */
+.action-item { padding:14px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:14px; text-decoration:none; color:var(--text); transition:background .15s; }
+.action-item:last-child { border-bottom:none; }
+.action-item:hover { background:var(--bg3); }
+.action-icon { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.action-icon.amber { background:color-mix(in srgb,var(--accent) 14%,transparent); border:1px solid color-mix(in srgb,var(--accent) 25%,transparent); }
+.action-icon.green { background:color-mix(in srgb,var(--success) 14%,transparent); border:1px solid color-mix(in srgb,var(--success) 25%,transparent); }
+.action-icon.blue  { background:color-mix(in srgb,var(--info) 14%,transparent); border:1px solid color-mix(in srgb,var(--info) 25%,transparent); }
+.action-text { font-size:14px; font-weight:500; }
+.action-sub  { font-size:12px; color:var(--muted); }
+.arrow { margin-left:auto; color:var(--muted); font-size:18px; }
+
+/* FLASHES */
+.flashes { margin-bottom:20px; }
+.flash { padding:12px 18px; border-radius:var(--radius); font-size:14px; margin-bottom:8px; }
+.flash.success { background:color-mix(in srgb,var(--success) 14%,transparent); border:1px solid color-mix(in srgb,var(--success) 28%,transparent); color:var(--success); }
+.flash.error   { background:color-mix(in srgb,var(--danger) 14%,transparent);  border:1px solid color-mix(in srgb,var(--danger) 28%,transparent);  color:var(--danger); }
+
+footer { text-align:center; color:var(--muted); font-size:13px; padding:40px 0 24px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+    <div class="nav-brand">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".25"/></svg>
+        StockLedger
+    </div>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}" class="active">Dashboard</a>
+        <a href="{{ url_for('products') }}">Products</a>
+        <a href="{{ url_for('add_product') }}">Add Product</a>
+        <a href="{{ url_for('sell_product') }}">Sell</a>
+        {% if session.role in ['admin','manager'] %}
+        <a href="{{ url_for('sales_report') }}">Reports</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    </div>
+</nav>
+
+<div class="page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="flashes">{% for c,m in messages %}<div class="flash {{c}}">{{m}}</div>{% endfor %}</div>{% endif %}
+    {% endwith %}
+
+    <div class="page-header">
+        <div>
+            <h1>Welcome back, {{ user }}</h1>
+            <p class="sub">Here's your inventory at a glance</p>
+        </div>
+        <div class="chip"><span class="chip-dot"></span>Live data</div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stat-grid">
+        <div class="stat-card" style="--card-accent:var(--accent)">
+            <div class="label">Total Products</div>
+            <div class="value accent">{{ stats.total_products }}</div>
+        </div>
+        <div class="stat-card" style="--card-accent:var(--info)">
+            <div class="label">Inventory Value</div>
+            <div class="value info">₹{{ "%.0f"|format(stats.total_value) }}</div>
+        </div>
+        <div class="stat-card" style="--card-accent:var(--success)">
+            <div class="label">Today's Sales</div>
+            <div class="value success">₹{{ "%.0f"|format(today_sales) }}</div>
+        </div>
+        <div class="stat-card" style="--card-accent:var(--success)">
+            <div class="label">Today's Profit</div>
+            <div class="value success">₹{{ "%.0f"|format(today_profit) }}</div>
+        </div>
+        <div class="stat-card" style="--card-accent:var(--danger)">
+            <div class="label">Low Stock Items</div>
+            <div class="value {% if alerts|length > 0 %}danger{% else %}success{% endif %}">{{ alerts|length }}</div>
+        </div>
+    </div>
+
+    <div class="dashboard-body">
+        <!-- LOW STOCK ALERTS -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Low Stock Alerts</span>
+                <a href="{{ url_for('products') }}?low_stock=1" style="font-size:13px;color:var(--accent);text-decoration:none;">View all</a>
+            </div>
+            <div class="card-body">
+                {% if alerts %}
+                    {% for item in alerts %}
+                    <div class="alert-item">
+                        <div>
+                            <div class="alert-name">{{ item.name }}</div>
+                            <div class="alert-detail">Min threshold: {{ item.min_stock }}</div>
+                        </div>
+                        <span class="badge badge-low">{{ item.quantity }} left</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">All products are sufficiently stocked</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="card">
+            <div class="card-header"><span class="card-title">Quick Actions</span></div>
+            <div class="card-body">
+                <a href="{{ url_for('add_product') }}" class="action-item">
+                    <div class="action-icon amber">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="#f0a500" stroke-width="1.8" stroke-linecap="round"/></svg>
+                    </div>
+                    <div><div class="action-text">Add Product</div><div class="action-sub">Register new inventory item</div></div>
+                    <span class="arrow">›</span>
+                </a>
+                <a href="{{ url_for('sell_product') }}" class="action-item">
+                    <div class="action-icon green">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M4 4V3a1 1 0 011-1h6a1 1 0 011 1v1M6 8h4M6 11h4" stroke="#3fcb7f" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div><div class="action-text">Record Sale</div><div class="action-sub">Log a product sale</div></div>
+                    <span class="arrow">›</span>
+                </a>
+                <a href="{{ url_for('products') }}" class="action-item">
+                    <div class="action-icon blue">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="2" rx="1" fill="#5b8dee"/><rect x="2" y="7" width="12" height="2" rx="1" fill="#5b8dee" opacity=".6"/><rect x="2" y="11" width="8" height="2" rx="1" fill="#5b8dee" opacity=".3"/></svg>
+                    </div>
+                    <div><div class="action-text">View Products</div><div class="action-sub">Browse full inventory</div></div>
+                    <span class="arrow">›</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>StockLedger © 2026 — Inventory Management System</footer>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

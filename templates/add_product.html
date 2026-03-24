@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Product | StockLedger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg:#0d0f14; --bg2:#13161e; --bg3:#1a1e2a;
+    --border:#252a38; --border2:#2e3449;
+    --text:#e8eaf0; --muted:#7a8199;
+    --accent:#f0a500; --accent2:#f7c948;
+    --danger:#e05c5c; --success:#3fcb7f;
+    --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+    --radius:10px; --radius-lg:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:15px; line-height:1.6; min-height:100vh; }
+.nav { position:sticky; top:0; z-index:100; background:var(--bg2); border-bottom:1px solid var(--border); padding:0 32px; display:flex; align-items:center; justify-content:space-between; height:60px; }
+.nav-brand { font-size:16px; font-weight:600; color:var(--accent); letter-spacing:.02em; display:flex; align-items:center; gap:8px; }
+.nav-links { display:flex; align-items:center; gap:4px; }
+.nav-links a { color:var(--muted); text-decoration:none; font-size:14px; padding:6px 14px; border-radius:8px; transition:all .18s; }
+.nav-links a:hover,.nav-links a.active { color:var(--text); background:var(--bg3); }
+.nav-links .logout { color:var(--danger); border:1px solid color-mix(in srgb,var(--danger) 25%,transparent); margin-left:8px; }
+.nav-links .logout:hover { background:color-mix(in srgb,var(--danger) 12%,transparent); }
+.page { max-width:800px; margin:0 auto; padding:40px 32px; animation:rise .35s ease both; }
+@keyframes rise { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+
+.breadcrumb { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); margin-bottom:28px; }
+.breadcrumb a { color:var(--muted); text-decoration:none; }
+.breadcrumb a:hover { color:var(--accent); }
+.breadcrumb .sep { opacity:.4; }
+.breadcrumb .current { color:var(--text); }
+
+.card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
+.card-header { padding:22px 28px; border-bottom:1px solid var(--border); }
+.card-header h1 { font-size:20px; font-weight:600; }
+.card-header p { font-size:13px; color:var(--muted); margin-top:3px; }
+.card-body { padding:28px; }
+
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.full { grid-column:1/-1; }
+@media(max-width:600px){ .form-grid{grid-template-columns:1fr;} .full{grid-column:auto;} }
+
+.form-group { display:flex; flex-direction:column; gap:7px; }
+label { font-size:12px; font-weight:500; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
+input, select {
+    padding:11px 14px; background:var(--bg3); border:1px solid var(--border2);
+    border-radius:var(--radius); color:var(--text); font-family:var(--font); font-size:14px;
+    transition:border-color .18s, box-shadow .18s;
+}
+input:focus, select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent); }
+input::placeholder { color:var(--muted); }
+select option { background:var(--bg2); }
+
+.section-divider { border:none; border-top:1px solid var(--border); margin:4px 0; grid-column:1/-1; }
+.section-label { grid-column:1/-1; font-size:11px; font-weight:500; color:var(--muted); text-transform:uppercase; letter-spacing:.07em; padding-bottom:4px; border-bottom:1px solid var(--border); }
+
+.card-footer { padding:20px 28px; border-top:1px solid var(--border); display:flex; align-items:center; gap:12px; justify-content:flex-end; }
+.btn { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; border-radius:var(--radius); border:none; font-family:var(--font); font-size:14px; font-weight:500; cursor:pointer; text-decoration:none; transition:all .18s; }
+.btn-primary { background:var(--accent); color:#0d0f14; }
+.btn-primary:hover { background:var(--accent2); }
+.btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border2); }
+.btn-ghost:hover { color:var(--text); border-color:var(--muted); background:var(--bg3); }
+
+.hint { font-size:12px; color:var(--muted); margin-top:2px; }
+footer { text-align:center; color:var(--muted); font-size:13px; padding:40px 0 24px; }
+</style>
+</head>
+<body>
+<nav class="nav">
+    <div class="nav-brand">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".25"/></svg>
+        StockLedger
+    </div>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('products') }}">Products</a>
+        <a href="{{ url_for('add_product') }}" class="active">Add Product</a>
+        <a href="{{ url_for('sell_product') }}">Sell</a>
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    </div>
+</nav>
+
+<div class="page">
+    <div class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <span class="sep">›</span>
+        <a href="{{ url_for('products') }}">Products</a>
+        <span class="sep">›</span>
+        <span class="current">Add product</span>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h1>Add New Product</h1>
+            <p>Fill in the details below to register a new inventory item</p>
+        </div>
+        <div class="card-body">
+            <form method="POST" id="productForm">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Product Name</label>
+                        <input type="text" name="name" placeholder="e.g. Basmati Rice 1kg" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" name="category" placeholder="e.g. Grains" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit</label>
+                        <select name="unit" required>
+                            <option value="">— Select unit —</option>
+                            <option value="Kg">Kilogram (Kg)</option>
+                            <option value="Gram">Gram</option>
+                            <option value="Litre">Litre</option>
+                            <option value="Piece">Piece / Packet</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Net Weight</label>
+                        <input type="number" step="0.01" min="0" name="net_weight" placeholder="0.00" required>
+                        <span class="hint">Per unit weight or volume</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity in Stock</label>
+                        <input type="number" step="0.01" min="0" name="quantity" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Minimum Stock Alert</label>
+                        <input type="number" min="0" name="min_stock" placeholder="5" value="5" required>
+                        <span class="hint">Alert when qty drops below this</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Purchase Price (₹)</label>
+                        <input type="number" step="0.01" min="0" name="purchase_price" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Selling Price (₹)</label>
+                        <input type="number" step="0.01" min="0" name="selling_price" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group full" id="marginPreview" style="display:none;">
+                        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:14px 18px;display:flex;gap:32px;">
+                            <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Margin per unit</div><div id="marginAmt" style="font-size:18px;font-weight:600;font-family:var(--mono);color:var(--success);">₹0</div></div>
+                            <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Margin %</div><div id="marginPct" style="font-size:18px;font-weight:600;font-family:var(--mono);color:var(--accent);">0%</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer" style="padding:20px 0 0;margin-top:28px;border-top:1px solid var(--border);">
+                    <a href="{{ url_for('products') }}" class="btn btn-ghost">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                        Save Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<footer>StockLedger © 2026</footer>
+
+<script>
+const pp = document.querySelector('[name=purchase_price]');
+const sp = document.querySelector('[name=selling_price]');
+const preview = document.getElementById('marginPreview');
+const marginAmt = document.getElementById('marginAmt');
+const marginPct = document.getElementById('marginPct');
+function updateMargin(){
+    const p = parseFloat(pp.value)||0;
+    const s = parseFloat(sp.value)||0;
+    if(p>0 && s>0){
+        preview.style.display='block';
+        const m = s - p;
+        const pct = (m/p*100);
+        marginAmt.textContent = '₹' + m.toFixed(2);
+        marginAmt.style.color = m>=0 ? 'var(--success)' : 'var(--danger)';
+        marginPct.textContent = pct.toFixed(1) + '%';
+        marginPct.style.color = m>=0 ? 'var(--accent)' : 'var(--danger)';
+    } else { preview.style.display='none'; }
+}
+pp.addEventListener('input', updateMargin);
+sp.addEventListener('input', updateMargin);
+</script>
+</body>
+</html>

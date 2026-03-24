@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %} | StockLedger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        :root {
+            --bg:        #0d0f14;
+            --bg2:       #13161e;
+            --bg3:       #1a1e2a;
+            --border:    #252a38;
+            --border2:   #2e3449;
+            --text:      #e8eaf0;
+            --muted:     #7a8199;
+            --accent:    #f0a500;
+            --accent2:   #f7c948;
+            --danger:    #e05c5c;
+            --success:   #3fcb7f;
+            --info:      #5b8dee;
+            --font:      'DM Sans', sans-serif;
+            --mono:      'DM Mono', monospace;
+            --radius:    10px;
+            --radius-lg: 16px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:15px; line-height:1.6; min-height:100vh; }
+
+        /* NAV */
+        .nav {
+            position:sticky; top:0; z-index:100;
+            background:var(--bg2);
+            border-bottom:1px solid var(--border);
+            padding:0 32px;
+            display:flex; align-items:center; justify-content:space-between;
+            height:60px;
+        }
+        .nav-brand { font-size:16px; font-weight:600; color:var(--accent); letter-spacing:0.02em; display:flex; align-items:center; gap:8px; }
+        .nav-brand svg { opacity:.9; }
+        .nav-links { display:flex; align-items:center; gap:4px; }
+        .nav-links a {
+            color:var(--muted); text-decoration:none; font-size:14px; font-weight:400;
+            padding:6px 14px; border-radius:8px; transition:all .18s;
+        }
+        .nav-links a:hover { color:var(--text); background:var(--bg3); }
+        .nav-links a.active { color:var(--text); background:var(--bg3); }
+        .nav-links .btn-logout {
+            color:var(--danger); border:1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+            margin-left:8px;
+        }
+        .nav-links .btn-logout:hover { background:color-mix(in srgb, var(--danger) 12%, transparent); }
+
+        /* PAGE SHELL */
+        .page { max-width:1280px; margin:0 auto; padding:40px 32px; }
+
+        /* CARDS */
+        .card {
+            background:var(--bg2); border:1px solid var(--border);
+            border-radius:var(--radius-lg); padding:28px;
+        }
+
+        /* FLASH */
+        .flashes { margin-bottom:20px; }
+        .flash { padding:12px 18px; border-radius:var(--radius); font-size:14px; margin-bottom:8px; }
+        .flash.success { background:color-mix(in srgb,var(--success) 15%,transparent); border:1px solid color-mix(in srgb,var(--success) 35%,transparent); color:var(--success); }
+        .flash.error   { background:color-mix(in srgb,var(--danger) 15%,transparent);  border:1px solid color-mix(in srgb,var(--danger) 35%,transparent);  color:var(--danger);  }
+
+        /* BUTTONS */
+        .btn { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:var(--radius); border:none; font-family:var(--font); font-size:14px; font-weight:500; cursor:pointer; text-decoration:none; transition:all .18s; }
+        .btn-primary { background:var(--accent); color:#0d0f14; }
+        .btn-primary:hover { background:var(--accent2); transform:translateY(-1px); }
+        .btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border2); }
+        .btn-ghost:hover { color:var(--text); border-color:var(--muted); background:var(--bg3); }
+        .btn-danger-soft { background:color-mix(in srgb,var(--danger) 12%,transparent); color:var(--danger); border:1px solid color-mix(in srgb,var(--danger) 30%,transparent); }
+        .btn-danger-soft:hover { background:color-mix(in srgb,var(--danger) 22%,transparent); }
+        .btn-sm { padding:6px 13px; font-size:13px; }
+
+        /* FORM ELEMENTS */
+        .form-group { margin-bottom:20px; }
+        .form-label { display:block; font-size:13px; font-weight:500; color:var(--muted); margin-bottom:7px; letter-spacing:0.02em; }
+        .form-input, .form-select {
+            width:100%; padding:11px 14px;
+            background:var(--bg3); border:1px solid var(--border2);
+            border-radius:var(--radius); color:var(--text); font-family:var(--font); font-size:14px;
+            transition:border-color .18s, box-shadow .18s;
+        }
+        .form-input:focus, .form-select:focus {
+            outline:none; border-color:var(--accent);
+            box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent);
+        }
+        .form-select option { background:var(--bg2); }
+
+        /* TABLE */
+        .table-wrap { overflow-x:auto; border-radius:var(--radius-lg); border:1px solid var(--border); }
+        table { width:100%; border-collapse:collapse; }
+        thead tr { border-bottom:1px solid var(--border); }
+        thead th { padding:13px 16px; font-size:12px; font-weight:500; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; text-align:left; white-space:nowrap; }
+        tbody tr { border-bottom:1px solid var(--border); transition:background .15s; }
+        tbody tr:last-child { border-bottom:none; }
+        tbody tr:hover { background:var(--bg3); }
+        tbody td { padding:14px 16px; font-size:14px; color:var(--text); }
+
+        /* BADGES */
+        .badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:500; }
+        .badge-low  { background:color-mix(in srgb,var(--danger) 15%,transparent);  color:var(--danger); }
+        .badge-ok   { background:color-mix(in srgb,var(--success) 15%,transparent); color:var(--success); }
+        .badge-warn { background:color-mix(in srgb,var(--accent) 15%,transparent);  color:var(--accent); }
+
+        /* PAGE HEADER */
+        .page-heading { font-size:24px; font-weight:600; color:var(--text); }
+        .page-sub { font-size:14px; color:var(--muted); margin-top:4px; }
+
+        /* GRID */
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+        .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+        .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+        @media(max-width:900px) { .grid-4,.grid-3 { grid-template-columns:1fr 1fr; } }
+        @media(max-width:600px) { .grid-2,.grid-4,.grid-3 { grid-template-columns:1fr; } }
+
+        /* MISC */
+        .text-muted  { color:var(--muted); }
+        .text-accent { color:var(--accent); }
+        .text-danger { color:var(--danger); }
+        .text-success{ color:var(--success); }
+        .mono        { font-family:var(--mono); }
+        .divider     { border:none; border-top:1px solid var(--border); margin:24px 0; }
+        footer.foot  { text-align:center; color:var(--muted); font-size:13px; padding:40px 0 24px; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-brand">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".25"/></svg>
+            StockLedger
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('products') }}">Products</a>
+            <a href="{{ url_for('add_product') }}">Add Product</a>
+            <a href="{{ url_for('sell_product') }}">Sell</a>
+            {% if session.role in ['admin','manager'] %}
+            <a href="{{ url_for('sales_report') }}">Reports</a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+    <div class="main-container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
