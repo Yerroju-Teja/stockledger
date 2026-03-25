@@ -10,7 +10,7 @@ from db import (
     add_product, delete_product, get_all_products,
     get_dashboard_stats, get_low_stock_alerts,
     get_product_by_id, get_products_filtered,
-    get_sales_report, get_today_sales_profit,
+    get_sales_report_data, get_today_sales_profit,
     get_user_by_username, create_user, record_sale, update_product
 )
 
@@ -163,7 +163,7 @@ def products():
     category  = request.args.get("category", "").strip()
     min_price = request.args.get("min_price", "").strip()
     max_price = request.args.get("max_price", "").strip()
-    low_stock = request.args.get("low_stock")
+    low_stock = request.args.get("low_stock")          # "1" or None
     sort      = request.args.get("sort", "")
 
     items, total, categories = get_products_filtered(
@@ -181,7 +181,7 @@ def products():
 
     return render_template(
         "products.html",
-        products=items,
+        products=items,      # shadowed below — keep variable name matching template
         page=page,
         total_pages=total_pages,
         search=search,
@@ -190,10 +190,9 @@ def products():
         min_price=min_price,
         max_price=max_price,
         low_stock=low_stock,
-        sort=sort
+        sort=sort,
+        
     )
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -333,12 +332,8 @@ def sell_product():
             flash(f'Not enough stock. Only {product["quantity"]} available.', "error")
             return redirect(url_for("sell_product"))
 
-        selling_price = float(product["selling_price"])
-        purchase_price = float(product["purchase_price"])
-        qty = float(qty)
-
-        amount = qty * selling_price
-        profit = qty * (selling_price - purchase_price)
+        amount = qty * product["selling_price"]
+        profit = qty * (product["selling_price"] - product["purchase_price"])
 
         success = record_sale(
             product_id=int(product_id),
@@ -362,10 +357,24 @@ def sell_product():
 # Sales report  (admin / manager only)
 # ---------------------------------------------------------------------------
 @app.route("/sales-report")
-@role_required("admin", "manager")
 def sales_report():
-    sales = get_sales_report(limit=100)
-    return render_template("sales_report.html", sales=sales)
+    date_from = request.args.get("date_from", "").strip() or None
+    date_to   = request.args.get("date_to",   "").strip() or None
+
+    stats, sales, chart_daily, chart_top = get_sales_report_data(
+        date_from=date_from,
+        date_to=date_to
+    )
+
+    return render_template(
+        "sales_report.html",
+        stats=stats,
+        sales=sales,
+        chart_daily=chart_daily,
+        chart_top=chart_top,
+        date_from=date_from or "",
+        date_to=date_to or ""
+    )
 
 
 # ---------------------------------------------------------------------------

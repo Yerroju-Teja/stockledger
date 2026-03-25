@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Report | StockLedger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg:#0d0f14; --bg2:#13161e; --bg3:#1a1e2a;
+    --border:#252a38; --border2:#2e3449;
+    --text:#e8eaf0; --muted:#7a8199;
+    --accent:#f0a500; --accent2:#f7c948;
+    --danger:#e05c5c; --success:#3fcb7f; --info:#5b8dee;
+    --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+    --radius:10px; --radius-lg:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.6;min-height:100vh;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;}
+.nav-brand{font-size:16px;font-weight:600;color:var(--accent);letter-spacing:.02em;display:flex;align-items:center;gap:8px;}
+.nav-links{display:flex;align-items:center;gap:4px;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;padding:6px 14px;border-radius:8px;transition:all .18s;}
+.nav-links a:hover,.nav-links a.active{color:var(--text);background:var(--bg3);}
+.nav-links .logout{color:var(--danger);border:1px solid color-mix(in srgb,var(--danger) 25%,transparent);margin-left:8px;}
+.nav-links .logout:hover{background:color-mix(in srgb,var(--danger) 12%,transparent);}
+
+/* PAGE */
+.page{max-width:1280px;margin:0 auto;padding:40px 32px;animation:rise .35s ease both;}
+@keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* HEADER */
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px;}
+.page-header h1{font-size:24px;font-weight:600;}
+.page-header .sub{font-size:14px;color:var(--muted);margin-top:3px;font-weight:300;}
+
+/* DATE FILTER */
+.filter-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 22px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.filter-bar label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:500;}
+.filter-bar input[type=date]{padding:8px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--font);font-size:13px;transition:border-color .18s;}
+.filter-bar input[type=date]:focus{outline:none;border-color:var(--accent);}
+.filter-bar input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.6);}
+.filter-sep{color:var(--muted);font-size:13px;}
+.btn-filter{padding:8px 16px;background:var(--accent);color:#0d0f14;border:none;border-radius:var(--radius);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:all .18s;}
+.btn-filter:hover{background:var(--accent2);}
+.btn-reset{padding:8px 14px;background:transparent;color:var(--muted);border:1px solid var(--border2);border-radius:var(--radius);font-family:var(--font);font-size:13px;cursor:pointer;text-decoration:none;transition:all .18s;}
+.btn-reset:hover{color:var(--text);border-color:var(--muted);}
+.quick-btns{display:flex;gap:6px;margin-left:auto;}
+.quick-btn{padding:6px 12px;background:transparent;border:1px solid var(--border2);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;font-family:var(--font);transition:all .15s;}
+.quick-btn:hover,.quick-btn.active{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent);}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+@media(max-width:900px){.stat-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:500px){.stat-grid{grid-template-columns:1fr;}}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px 20px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--card-color,var(--border)),transparent);opacity:.8;}
+.stat-card .s-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin-bottom:12px;}
+.stat-card .s-value{font-size:26px;font-weight:600;font-family:var(--mono);line-height:1;}
+.stat-card .s-delta{font-size:12px;color:var(--muted);margin-top:8px;}
+
+/* CHARTS ROW */
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;}
+@media(max-width:900px){.charts-row{grid-template-columns:1fr;}}
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;}
+.chart-card h3{font-size:14px;font-weight:500;color:var(--text);margin-bottom:20px;}
+.chart-wrap{position:relative;height:220px;}
+
+/* TABLE */
+.table-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
+.table-card-header{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.table-card-header h3{font-size:14px;font-weight:500;}
+.record-count{font-size:13px;color:var(--muted);}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead tr{border-bottom:1px solid var(--border);}
+thead th{padding:12px 16px;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;text-align:left;white-space:nowrap;background:var(--bg2);}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--bg3);}
+tbody td{padding:13px 16px;font-size:14px;}
+.mono{font-family:var(--mono);font-size:13px;}
+.profit-pos{color:var(--success);}
+.profit-neg{color:var(--danger);}
+.badge-sale{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:500;background:color-mix(in srgb,var(--success) 12%,transparent);border:1px solid color-mix(in srgb,var(--success) 25%,transparent);color:var(--success);}
+.empty-row td{text-align:center;padding:60px;color:var(--muted);font-size:14px;}
+
+/* FLASHES */
+.flashes{margin-bottom:20px;}
+.flash{padding:12px 18px;border-radius:var(--radius);font-size:14px;margin-bottom:8px;}
+.flash.error{background:color-mix(in srgb,var(--danger) 14%,transparent);border:1px solid color-mix(in srgb,var(--danger) 28%,transparent);color:var(--danger);}
+
+footer{text-align:center;color:var(--muted);font-size:13px;padding:40px 0 24px;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+    <div class="nav-brand">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".25"/></svg>
+        StockLedger
+    </div>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('products') }}">Products</a>
+        <a href="{{ url_for('add_product') }}">Add Product</a>
+        <a href="{{ url_for('sell_product') }}">Sell</a>
+        <a href="{{ url_for('sales_report') }}" class="active">Reports</a>
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    </div>
+</nav>
+
+<div class="page">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="flashes">{% for c,m in messages %}<div class="flash {{c}}">{{m}}</div>{% endfor %}</div>{% endif %}
+    {% endwith %}
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div>
+            <h1>Sales Report</h1>
+            <p class="sub">
+                {% if date_from or date_to %}
+                    Showing results
+                    {% if date_from %} from {{ date_from }}{% endif %}
+                    {% if date_to %} to {{ date_to }}{% endif %}
+                {% else %}
+                    All time — {{ stats.total_transactions }} transactions
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- DATE FILTER -->
+    <form method="GET" id="filterForm">
+        <div class="filter-bar">
+            <label>From</label>
+            <input type="date" name="date_from" value="{{ date_from }}" id="inputFrom">
+            <span class="filter-sep">→</span>
+            <label>To</label>
+            <input type="date" name="date_to" value="{{ date_to }}" id="inputTo">
+            <button type="submit" class="btn-filter">Apply</button>
+            <a href="{{ url_for('sales_report') }}" class="btn-reset">Clear</a>
+            <div class="quick-btns">
+                <button type="button" class="quick-btn" onclick="setRange(7)">7 days</button>
+                <button type="button" class="quick-btn" onclick="setRange(30)">30 days</button>
+                <button type="button" class="quick-btn" onclick="setRange('month')">This month</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- STAT CARDS -->
+    <div class="stat-grid">
+        <div class="stat-card" style="--card-color:var(--accent)">
+            <div class="s-label">Total Revenue</div>
+            <div class="s-value" style="color:var(--accent)">₹{{ "%.0f"|format(stats.total_revenue) }}</div>
+            <div class="s-delta">across {{ stats.total_transactions }} sales</div>
+        </div>
+        <div class="stat-card" style="--card-color:var(--success)">
+            <div class="s-label">Total Profit</div>
+            <div class="s-value" style="color:var(--success)">₹{{ "%.0f"|format(stats.total_profit) }}</div>
+            <div class="s-delta">
+                {% if stats.total_revenue > 0 %}
+                    {{ "%.1f"|format(stats.total_profit / stats.total_revenue * 100) }}% margin
+                {% else %}—{% endif %}
+            </div>
+        </div>
+        <div class="stat-card" style="--card-color:var(--info)">
+            <div class="s-label">Units Sold</div>
+            <div class="s-value" style="color:var(--info)">{{ "%.0f"|format(stats.total_units) }}</div>
+            <div class="s-delta">total quantity moved</div>
+        </div>
+        <div class="stat-card" style="--card-color:var(--muted)">
+            <div class="s-label">Avg. Sale Value</div>
+            <div class="s-value" style="color:var(--text)">
+                ₹{{ "%.0f"|format(stats.total_revenue / stats.total_transactions) if stats.total_transactions > 0 else "0" }}
+            </div>
+            <div class="s-delta">per transaction</div>
+        </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts-row">
+        <div class="chart-card">
+            <h3>Revenue over time</h3>
+            <div class="chart-wrap">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>Top products by revenue</h3>
+            <div class="chart-wrap">
+                <canvas id="topChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- SALES HISTORY TABLE -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <h3>Sales history</h3>
+            <span class="record-count">{{ sales|length }} records</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Product</th>
+                        <th>Qty sold</th>
+                        <th>Sale amount</th>
+                        <th>Profit</th>
+                        <th>Type</th>
+                        <th>Date &amp; time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if sales %}
+                        {% for s in sales %}
+                        <tr>
+                            <td class="mono" style="color:var(--muted);">{{ s.id }}</td>
+                            <td style="font-weight:500;">{{ s.product_name }}</td>
+                            <td class="mono">{{ s.quantity_sold }}</td>
+                            <td class="mono" style="color:var(--accent);">₹{{ "%.2f"|format(s.amount) }}</td>
+                            <td class="mono {% if s.profit >= 0 %}profit-pos{% else %}profit-neg{% endif %}">
+                                {% if s.profit >= 0 %}+{% endif %}₹{{ "%.2f"|format(s.profit) }}
+                            </td>
+                            <td><span class="badge-sale">
+                                <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="currentColor"/></svg>
+                                Sale
+                            </span></td>
+                            <td class="mono" style="color:var(--muted);">{{ s.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr class="empty-row">
+                            <td colspan="7">No sales found for the selected period</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer>StockLedger © 2026 — Inventory Management System</footer>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ── data injected from Flask ──────────────────────────────────────────────
+const chartDailyLabels = {{ chart_daily.labels | tojson }};
+const chartDailyRevenue = {{ chart_daily.revenue | tojson }};
+const chartDailyProfit  = {{ chart_daily.profit  | tojson }};
+const chartTopLabels    = {{ chart_top.labels  | tojson }};
+const chartTopRevenue   = {{ chart_top.revenue | tojson }};
+
+// ── shared Chart.js defaults ──────────────────────────────────────────────
+Chart.defaults.color = '#7a8199';
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size = 12;
+
+const gridColor = 'rgba(37,42,56,0.8)';
+
+// ── Revenue over time (line) ──────────────────────────────────────────────
+new Chart(document.getElementById('revenueChart'), {
+    type: 'line',
+    data: {
+        labels: chartDailyLabels,
+        datasets: [
+            {
+                label: 'Revenue',
+                data: chartDailyRevenue,
+                borderColor: '#f0a500',
+                backgroundColor: 'rgba(240,165,0,0.08)',
+                borderWidth: 2,
+                pointRadius: chartDailyLabels.length > 30 ? 0 : 3,
+                pointHoverRadius: 5,
+                tension: 0.35,
+                fill: true,
+            },
+            {
+                label: 'Profit',
+                data: chartDailyProfit,
+                borderColor: '#3fcb7f',
+                backgroundColor: 'rgba(63,203,127,0.06)',
+                borderWidth: 2,
+                pointRadius: chartDailyLabels.length > 30 ? 0 : 3,
+                pointHoverRadius: 5,
+                tension: 0.35,
+                fill: true,
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            legend: { position: 'top', labels: { boxWidth: 12, padding: 16 } },
+            tooltip: {
+                callbacks: {
+                    label: ctx => ' ₹' + ctx.parsed.y.toLocaleString('en-IN', {maximumFractionDigits: 0})
+                }
+            }
+        },
+        scales: {
+            x: { grid: { color: gridColor }, ticks: { maxTicksLimit: 10 } },
+            y: {
+                grid: { color: gridColor },
+                ticks: {
+                    callback: v => '₹' + (v >= 1000 ? (v/1000).toFixed(1)+'k' : v)
+                }
+            }
+        }
+    }
+});
+
+// ── Top products (horizontal bar) ─────────────────────────────────────────
+new Chart(document.getElementById('topChart'), {
+    type: 'bar',
+    data: {
+        labels: chartTopLabels,
+        datasets: [{
+            label: 'Revenue',
+            data: chartTopRevenue,
+            backgroundColor: [
+                'rgba(240,165,0,0.75)',
+                'rgba(91,141,238,0.75)',
+                'rgba(63,203,127,0.75)',
+                'rgba(224,92,92,0.75)',
+                'rgba(122,129,153,0.75)',
+            ],
+            borderRadius: 6,
+            borderSkipped: false,
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => ' ₹' + ctx.parsed.x.toLocaleString('en-IN', {maximumFractionDigits: 0})
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: { color: gridColor },
+                ticks: { callback: v => '₹' + (v >= 1000 ? (v/1000).toFixed(1)+'k' : v) }
+            },
+            y: { grid: { display: false } }
+        }
+    }
+});
+
+// ── Quick date range helpers ───────────────────────────────────────────────
+function setRange(n) {
+    const today = new Date();
+    const fmt = d => d.toISOString().split('T')[0];
+    document.getElementById('inputTo').value = fmt(today);
+    if (n === 'month') {
+        const first = new Date(today.getFullYear(), today.getMonth(), 1);
+        document.getElementById('inputFrom').value = fmt(first);
+    } else {
+        const from = new Date(today);
+        from.setDate(today.getDate() - n);
+        document.getElementById('inputFrom').value = fmt(from);
+    }
+    document.getElementById('filterForm').submit();
+}
+</script>
+</body>
+</html>
