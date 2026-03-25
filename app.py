@@ -332,8 +332,11 @@ def sell_product():
             flash(f'Not enough stock. Only {product["quantity"]} available.', "error")
             return redirect(url_for("sell_product"))
 
-        amount = qty * product["selling_price"]
-        profit = qty * (product["selling_price"] - product["purchase_price"])
+        selling_price = float(product["selling_price"])
+        purchase_price = float(product["purchase_price"])
+
+        amount = qty * selling_price
+        profit = qty * (selling_price - purchase_price)
 
         success = record_sale(
             product_id=int(product_id),
