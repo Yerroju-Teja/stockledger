@@ -250,15 +250,21 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:40px 0 24px;}
 
 <footer>StockLedger © 2026 — Inventory Management System</footer>
 
+<script id="chartDailyData" type="application/json">{{ chart_daily | tojson }}</script>
+<script id="chartTopData" type="application/json">{{ chart_top | tojson }}</script>
+
 <!-- Chart.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 // ── data injected from Flask ──────────────────────────────────────────────
-const chartDailyLabels = {{ chart_daily.labels | tojson }};
-const chartDailyRevenue = {{ chart_daily.revenue | tojson }};
-const chartDailyProfit  = {{ chart_daily.profit  | tojson }};
-const chartTopLabels    = {{ chart_top.labels  | tojson }};
-const chartTopRevenue   = {{ chart_top.revenue | tojson }};
+const chartDailyRaw = JSON.parse(document.getElementById('chartDailyData').textContent || '{}');
+const chartTopRaw = JSON.parse(document.getElementById('chartTopData').textContent || '{}');
+
+const chartDailyLabels = chartDailyRaw.labels || [];
+const chartDailyRevenue = chartDailyRaw.revenue || [];
+const chartDailyProfit = chartDailyRaw.profit || [];
+const chartTopLabels = chartTopRaw.labels || [];
+const chartTopRevenue = chartTopRaw.revenue || [];
 
 // ── shared Chart.js defaults ──────────────────────────────────────────────
 Chart.defaults.color = '#7a8199';
