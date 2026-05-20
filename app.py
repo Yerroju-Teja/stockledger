@@ -29,20 +29,6 @@ def login_required(f):
         return f(*args, **kwargs)
     return wrapper
 
-
-def role_required(*roles):
-    def decorator(f):
-        @wraps(f)
-        @login_required
-        def wrapper(*args, **kwargs):
-            if session.get("role") not in roles:
-                flash("You don't have permission to access that page.", "error")
-                return redirect(url_for("dashboard"))
-            return f(*args, **kwargs)
-        return wrapper
-    return decorator
-
-
 @app.route("/")
 def landing():
     if "user" in session:
