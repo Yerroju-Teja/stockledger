@@ -274,6 +274,7 @@ def get_all_products(user_id):
         conn.close()
 
 
+
 def add_product(
     user_id,
     name,
@@ -297,17 +298,19 @@ def add_product(
                 name,
                 category,
                 unit,
+                unit_type,
                 net_weight,
                 quantity,
                 purchase_price,
                 selling_price,
                 min_stock
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             user_id,
             name,
             category,
+            unit,
             unit,
             net_weight,
             quantity,
@@ -321,6 +324,8 @@ def add_product(
     finally:
         cursor.close()
         conn.close()
+
+
 
 
 def update_product(
