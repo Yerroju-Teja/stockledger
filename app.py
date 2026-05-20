@@ -49,7 +49,7 @@ def login():
         user = get_user_by_username(username)
         if user and check_password_hash(user["password"], password):
             session["user"] = user["username"]
-            session["role"] = user["role"]
+            session["user_id"] = user["id"]
             return redirect(url_for("dashboard"))
         flash("Invalid username or password.", "error")
     return render_template("login.html")
@@ -71,7 +71,7 @@ def signup():
         if get_user_by_username(username):
             flash("That username is already taken.", "error")
             return render_template("signup.html")
-        create_user(username, generate_password_hash(password), role="staff")
+        create_user(username, generate_password_hash(password))
         flash("Account created! You can now log in.", "success")
         return redirect(url_for("login"))
     return render_template("signup.html")
@@ -87,9 +87,11 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    stats  = get_dashboard_stats()
-    alerts = get_low_stock_alerts()
-    today  = get_today_sales_profit()
+    user_id = session["user_id"]
+    stats = get_dashboard_stats(user_id)
+    alerts = get_low_stock_alerts(user_id)
+    today = get_today_sales_profit(user_id)
+
     return render_template(
         "dashboard.html",
         user=session["user"],
@@ -112,6 +114,7 @@ def products():
     sort      = request.args.get("sort", "")
 
     items, total, categories = get_products_filtered(
+    user_id=session["user_id"],
         search=search,
         category=category,
         min_price=min_price or None,
@@ -140,6 +143,7 @@ def products():
 @app.route("/add-product", methods=["GET", "POST"])
 @login_required
 def add_product_route():
+    user_id=session["user_id"],
     if request.method == "POST":
         f = request.form
         name     = f.get("name", "").strip()
@@ -168,7 +172,7 @@ def add_product_route():
 @app.route("/edit-product/<int:id>", methods=["GET", "POST"])
 @login_required
 def edit_product(id):
-    product = get_product_by_id(id)
+    product = get_product_by_id(id, session["user_id"])
     if not product:
         flash("Product not found.", "error")
         return redirect(url_for("products"))
@@ -182,6 +186,7 @@ def edit_product(id):
             return render_template("edit_product.html", product=product)
         try:
             update_product(
+                user_id=session["user_id"],
                 product_id=id, name=name, category=category,
                 unit_type=unit_type,
                 quantity=float(f.get("quantity") or 0),
@@ -200,11 +205,11 @@ def edit_product(id):
 @app.route("/delete-product/<int:id>", methods=["POST"])
 @login_required
 def delete_product_route(id):
-    product = get_product_by_id(id)
+    product = get_product_by_id(id, session["user_id"])
     if not product:
         flash("Product not found.", "error")
         return redirect(url_for("products"))
-    delete_product(id)
+    delete_product(id, session["user_id"])
     flash(f'"{product["name"]}" deleted.', "success")
     return redirect(url_for("products"))
 
@@ -227,7 +232,10 @@ def sell_product():
             flash("Please enter a valid quantity.", "error")
             return redirect(url_for("sell_product"))
 
-        product = get_product_by_id(int(product_id))
+        product = get_product_by_id(
+                  int(product_id),
+                  session["user_id"]
+                  )
         if not product:
             flash("Product not found.", "error")
             return redirect(url_for("sell_product"))
@@ -239,6 +247,7 @@ def sell_product():
         profit = qty * (float(product["selling_price"]) - float(product["purchase_price"]))
 
         success = record_sale(
+            user_id=session["user_id"],
             product_id=int(product_id),
             quantity=qty,
             amount=round(amount, 2),
@@ -251,7 +260,7 @@ def sell_product():
             flash("Sale failed — stock may have changed. Please try again.", "error")
             return redirect(url_for("sell_product"))
 
-    return render_template("sell.html", products=get_all_products())
+    return render_template("sell.html", products=get_all_products(session["user_id"]))
 
 
 @app.route("/sales-report")
@@ -260,6 +269,7 @@ def sales_report():
     date_to   = request.args.get("date_to",   "").strip() or None
 
     stats, sales, chart_daily, chart_top = get_sales_report_data(
+        user_id=session["user_id"],
         date_from=date_from,
         date_to=date_to
     )
