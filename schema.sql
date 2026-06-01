@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- Products
 CREATE TABLE IF NOT EXISTS products (
     id             INT AUTO_INCREMENT PRIMARY KEY,
+    user_id        INT            NOT NULL,
     name           VARCHAR(100)   NOT NULL,
     category       VARCHAR(50)    NOT NULL,
     unit           VARCHAR(20)    NOT NULL,     -- display unit  (Kg / Litre / Piece …)
@@ -26,16 +27,22 @@ CREATE TABLE IF NOT EXISTS products (
     purchase_price DECIMAL(10,2)  NOT NULL DEFAULT 0,
     selling_price  DECIMAL(10,2)  NOT NULL DEFAULT 0,
     created_at     DATETIME       DEFAULT CURRENT_TIMESTAMP,
-    updated_at     DATETIME       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at     DATETIME       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_products_user (user_id)
 );
 
 -- Sales
 CREATE TABLE IF NOT EXISTS sales (
     id            INT AUTO_INCREMENT PRIMARY KEY,
+    user_id       INT            NOT NULL,
     product_id    INT            NOT NULL,
     quantity_sold DECIMAL(10,2)  NOT NULL,
     amount        DECIMAL(10,2)  NOT NULL,
     profit        DECIMAL(10,2)  NOT NULL,
     created_at    DATETIME       DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id)    REFERENCES users(id)    ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    INDEX idx_sales_user (user_id),
+    INDEX idx_sales_created (created_at)
 );

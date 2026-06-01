@@ -143,7 +143,7 @@ def products():
 @app.route("/add-product", methods=["GET", "POST"])
 @login_required
 def add_product_route():
-    user_id=session["user_id"],
+    user_id = session["user_id"]
     if request.method == "POST":
         f = request.form
         name     = f.get("name", "").strip()
@@ -154,6 +154,7 @@ def add_product_route():
             return render_template("add_product.html")
         try:
             add_product(
+                user_id=user_id,
                 name=name, category=category, unit=unit,
                 net_weight=float(f.get("net_weight") or 0),
                 quantity=float(f.get("quantity") or 0),
@@ -264,6 +265,7 @@ def sell_product():
 
 
 @app.route("/sales-report")
+@login_required
 def sales_report():
     date_from = request.args.get("date_from", "").strip() or None
     date_to   = request.args.get("date_to",   "").strip() or None
