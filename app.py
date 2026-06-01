@@ -33,7 +33,8 @@ def login_required(f):
 def landing():
     if "user" in session:
         return redirect(url_for("dashboard"))
-    return redirect(url_for("login"))
+    return render_template("index.html")
+
 
 
 @app.route("/login", methods=["GET", "POST"])
