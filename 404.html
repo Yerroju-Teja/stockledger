@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — Page Not Found | StockLedger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:#0d0f14; --bg2:#13161e; --bg3:#1a1e2a;
+            --border:#252a38; --border2:#2e3449;
+            --text:#e8eaf0; --muted:#7a8199;
+            --accent:#f0a500; --accent2:#f7c948;
+            --danger:#e05c5c; --success:#3fcb7f;
+            --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+            --radius:10px; --radius-lg:16px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            background:var(--bg);
+            color:var(--text);
+            font-family:var(--font);
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            padding:24px;
+            position:relative;
+            overflow:hidden;
+        }
+
+        /* Grid background */
+        body::before {
+            content:'';
+            position:fixed; inset:0;
+            background-image:
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size:48px 48px;
+            opacity:.3;
+            pointer-events:none;
+        }
+
+        /* Amber glow */
+        .glow {
+            position:fixed;
+            top:50%; left:50%;
+            transform:translate(-50%, -60%);
+            width:700px; height:500px;
+            background:radial-gradient(ellipse, color-mix(in srgb,var(--accent) 7%,transparent) 0%, transparent 65%);
+            pointer-events:none;
+            animation:breathe 4s ease-in-out infinite;
+        }
+        @keyframes breathe {
+            0%,100% { opacity:.6; transform:translate(-50%,-60%) scale(1); }
+            50%      { opacity:1;  transform:translate(-50%,-60%) scale(1.08); }
+        }
+
+        /* Main container */
+        .container {
+            position:relative;
+            z-index:1;
+            text-align:center;
+            animation:rise .5s ease both;
+            max-width:560px;
+        }
+        @keyframes rise {
+            from { opacity:0; transform:translateY(20px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        /* Big 404 */
+        .code-wrap {
+            position:relative;
+            display:inline-block;
+            margin-bottom:8px;
+        }
+        .code {
+            font-family:var(--mono);
+            font-size:clamp(80px, 18vw, 148px);
+            font-weight:500;
+            line-height:1;
+            color:var(--bg3);
+            letter-spacing:-4px;
+            user-select:none;
+            -webkit-text-stroke:1px var(--border2);
+        }
+        .code-overlay {
+            position:absolute;
+            inset:0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-family:var(--mono);
+            font-size:clamp(80px, 18vw, 148px);
+            font-weight:500;
+            line-height:1;
+            letter-spacing:-4px;
+            background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 60%, transparent 100%);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+            animation:shimmer 3s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0%,100% { opacity:.7; }
+            50%      { opacity:1; }
+        }
+
+        /* Icon */
+        .icon-wrap {
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            width:56px; height:56px;
+            background:var(--bg2);
+            border:1px solid var(--border2);
+            border-radius:16px;
+            margin-bottom:24px;
+            animation:float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%,100% { transform:translateY(0); }
+            50%      { transform:translateY(-6px); }
+        }
+
+        /* Text */
+        h1 {
+            font-size:22px;
+            font-weight:600;
+            color:var(--text);
+            margin-bottom:10px;
+        }
+        .sub {
+            font-size:15px;
+            color:var(--muted);
+            font-weight:300;
+            line-height:1.7;
+            margin-bottom:36px;
+        }
+        .sub code {
+            font-family:var(--mono);
+            font-size:13px;
+            background:var(--bg3);
+            border:1px solid var(--border2);
+            padding:2px 8px;
+            border-radius:5px;
+            color:var(--accent);
+        }
+
+        /* Stock badge */
+        .stock-badge {
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            background:color-mix(in srgb,var(--danger) 10%,transparent);
+            border:1px solid color-mix(in srgb,var(--danger) 25%,transparent);
+            color:var(--danger);
+            font-size:12px;
+            font-weight:500;
+            font-family:var(--mono);
+            padding:6px 14px;
+            border-radius:999px;
+            margin-bottom:32px;
+            letter-spacing:.02em;
+        }
+        .stock-dot {
+            width:6px; height:6px;
+            border-radius:50%;
+            background:var(--danger);
+            animation:blink 1.2s ease-in-out infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
+
+        /* Buttons */
+        .actions {
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:12px;
+            flex-wrap:wrap;
+        }
+        .btn {
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:11px 22px;
+            border-radius:var(--radius);
+            font-family:var(--font);
+            font-size:14px;
+            font-weight:500;
+            cursor:pointer;
+            text-decoration:none;
+            border:none;
+            transition:all .18s;
+        }
+        .btn-primary {
+            background:var(--accent);
+            color:#0d0f14;
+        }
+        .btn-primary:hover {
+            background:var(--accent2);
+            transform:translateY(-1px);
+            box-shadow:0 8px 24px color-mix(in srgb,var(--accent) 20%,transparent);
+        }
+        .btn-ghost {
+            background:transparent;
+            color:var(--muted);
+            border:1px solid var(--border2);
+        }
+        .btn-ghost:hover {
+            color:var(--text);
+            border-color:var(--muted);
+            background:var(--bg3);
+        }
+
+        /* Footer */
+        .foot {
+            position:fixed;
+            bottom:24px;
+            left:0; right:0;
+            text-align:center;
+            font-size:13px;
+            color:var(--border2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="glow"></div>
+
+<div class="container">
+
+    <div class="icon-wrap">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <path d="M3 6h18M3 12h18M3 18h12" stroke="#f0a500" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="19" cy="18" r="3" stroke="#e05c5c" stroke-width="1.6"/>
+            <path d="M17.5 16.5l3 3M20.5 16.5l-3 3" stroke="#e05c5c" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <div class="code-wrap">
+        <div class="code">404</div>
+        <div class="code-overlay">404</div>
+    </div>
+
+    <div class="stock-badge">
+        <span class="stock-dot"></span>
+        ITEM NOT FOUND — QTY: 0
+    </div>
+
+    <h1>This page is out of stock</h1>
+    <p class="sub">
+        The page you're looking for doesn't exist or was moved.<br>
+        Maybe check the URL — <code>{{ request.path }}</code> isn't in our inventory.
+    </p>
+
+    <div class="actions">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M6 1L1 7l5 6M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back to Dashboard
+        </a>
+        <a href="{{ url_for('products') }}" class="btn btn-ghost">
+            View Products
+        </a>
+    </div>
+
+</div>
+
+<div class="foot">StockLedger © 2026</div>
+
+</body>
+</html>
