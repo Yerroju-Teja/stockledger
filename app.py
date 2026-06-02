@@ -33,7 +33,7 @@ def login_required(f):
 def landing():
     if "user" in session:
         return redirect(url_for("dashboard"))
-    return send_from_directory(app.root_path, "index.html")
+    return render_template("index.html")
 
 
 
