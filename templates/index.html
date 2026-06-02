@@ -107,13 +107,13 @@
 <body>
 
 <nav>
-    <a href="/" class="nav-brand">
+    <a href="{{ url_for('landing') }}" class="nav-brand">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".25"/></svg>
         StockLedger
     </a>
     <div class="nav-actions">
-        <a href="/login" class="nav-link">Sign in</a>
-        <a href="/signup" class="nav-btn">Get started free</a>
+        <a href="{{ url_for('login') }}" class="nav-link">Sign in</a>
+        <a href="{{ url_for('signup') }}" class="nav-btn">Get started free</a>
     </div>
 </nav>
 
@@ -125,11 +125,11 @@
     <h1>Your entire stock.<br><span>One smart ledger.</span></h1>
     <p class="hero-sub">Track inventory, record sales, monitor profits, and get low-stock alerts — all from a single, beautiful dashboard.</p>
     <div class="hero-actions">
-        <a href="/signup" class="btn-hero primary">
+        <a href="{{ url_for('signup') }}" class="btn-hero primary">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v13M1 7.5h13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             Start for free
         </a>
-        <a href="/login" class="btn-hero ghost">Sign in →</a>
+        <a href="{{ url_for('login') }}" class="btn-hero ghost">Sign in →</a>
     </div>
     <div class="hero-stats">
         <div class="hero-stat"><div class="num">100%</div><div class="lbl">Free to use</div></div>
@@ -222,8 +222,8 @@
     <h2>Ready to take control of your inventory?</h2>
     <p>Sign up for free — no credit card, no setup fees. Just you and your stock.</p>
     <div class="cta-actions">
-        <a href="/signup" class="btn-hero primary">Create free account →</a>
-        <a href="/login" class="btn-hero ghost">Already have an account</a>
+        <a href="{{ url_for('signup') }}" class="btn-hero primary">Create free account →</a>
+        <a href="{{ url_for('login') }}" class="btn-hero ghost">Already have an account</a>
     </div>
 </div>
 

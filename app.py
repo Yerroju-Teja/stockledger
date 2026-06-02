@@ -3,7 +3,7 @@ import os
 from functools import wraps
 
 from flask import (Flask, flash, redirect, render_template,
-                   request, session, url_for)
+                   request, session, url_for, send_from_directory)
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from db import (
@@ -33,7 +33,8 @@ def login_required(f):
 def landing():
     if "user" in session:
         return redirect(url_for("dashboard"))
-    return render_template("index.html")
+    return send_from_directory(app.root_path, "index.html")
+
 
 
 
