@@ -257,13 +257,7 @@ def get_all_products(user_id):
         cursor = conn.cursor(dictionary=True)
 
         cursor.execute("""
-            SELECT
-                id,
-                name,
-                unit,
-                quantity,
-                purchase_price,
-                selling_price
+            SELECT *
             FROM products
             WHERE user_id = %s
             ORDER BY name ASC
