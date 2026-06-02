@@ -463,6 +463,78 @@ def record_sale(product_id, user_id, quantity, amount, profit):
         conn.close()
 
 
+def record_multiple_sales(user_id, cart_items):
+    """
+    Records multiple sales in a single transaction.
+    cart_items is a list of dicts: [{'product_id': int, 'quantity': float, 'amount': float, 'profit': float}, ...]
+    Returns True if successful, False if any product has insufficient stock or is not found.
+    """
+    conn = get_db_connection()
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+
+        for item in cart_items:
+            product_id = item["product_id"]
+            quantity = float(item["quantity"])
+            amount = float(item["amount"])
+            profit = float(item["profit"])
+
+            cursor.execute("""
+                SELECT quantity
+                FROM products
+                WHERE id = %s
+                AND user_id = %s
+                FOR UPDATE
+            """, (product_id, user_id))
+
+            product = cursor.fetchone()
+
+            if not product or quantity > float(product["quantity"]):
+                conn.rollback()
+                return False
+
+            cursor.execute("""
+                INSERT INTO sales
+                (
+                    user_id,
+                    product_id,
+                    quantity_sold,
+                    amount,
+                    profit
+                )
+                VALUES (%s, %s, %s, %s, %s)
+            """, (
+                user_id,
+                product_id,
+                quantity,
+                amount,
+                profit
+            ))
+
+            cursor.execute("""
+                UPDATE products
+                SET quantity = quantity - %s
+                WHERE id = %s
+                AND user_id = %s
+            """, (
+                quantity,
+                product_id,
+                user_id
+            ))
+
+        conn.commit()
+        return True
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
 # ───────────────── SALES REPORT ─────────────────
 
 def get_sales_report_data(user_id, date_from=None, date_to=None):

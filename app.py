@@ -11,7 +11,8 @@ from db import (
     get_dashboard_stats, get_low_stock_alerts,
     get_product_by_id, get_products_filtered,
     get_sales_report_data, get_today_sales_profit,
-    get_user_by_username, create_user, record_sale, update_product
+    get_user_by_username, create_user, record_sale, update_product,
+    record_multiple_sales
 )
 
 app = Flask(__name__)
@@ -221,46 +222,46 @@ def delete_product_route(id):
 @login_required
 def sell_product():
     if request.method == "POST":
-        product_id = request.form.get("product_id")
-        qty_raw    = request.form.get("quantity")
-
-        if not product_id or not qty_raw:
-            flash("Please select a product and enter a quantity.", "error")
-            return redirect(url_for("sell_product"))
-        try:
-            qty = float(qty_raw)
-            if qty <= 0:
-                raise ValueError
-        except ValueError:
-            flash("Please enter a valid quantity.", "error")
-            return redirect(url_for("sell_product"))
-
-        product = get_product_by_id(
-                  int(product_id),
-                  session["user_id"]
-                  )
-        if not product:
-            flash("Product not found.", "error")
-            return redirect(url_for("sell_product"))
-        if qty > float(product["quantity"]):
-            flash(f'Not enough stock. Only {product["quantity"]} available.', "error")
-            return redirect(url_for("sell_product"))
-
-        amount = qty * float(product["selling_price"])
-        profit = qty * (float(product["selling_price"]) - float(product["purchase_price"]))
-
-        success = record_sale(
-            user_id=session["user_id"],
-            product_id=int(product_id),
-            quantity=qty,
-            amount=round(amount, 2),
-            profit=round(profit, 2)
-        )
-        if success:
-            flash(f'Sale recorded — ₹{amount:.2f} | Profit: ₹{profit:.2f}', "success")
-            return redirect(url_for("dashboard"))
+        if request.is_json:
+            cart = request.json
+            if not cart:
+                return {"success": False, "error": "Cart is empty."}, 400
+            
+            try:
+                formatted_cart = []
+                total_amount = 0
+                for item in cart:
+                    product = get_product_by_id(int(item["product_id"]), session["user_id"])
+                    if not product:
+                        return {"success": False, "error": "A product was not found."}, 404
+                    
+                    qty = float(item["quantity"])
+                    if qty <= 0:
+                        return {"success": False, "error": "Invalid quantity."}, 400
+                    if qty > float(product["quantity"]):
+                        return {"success": False, "error": f"Not enough stock for {product['name']}."}, 400
+                        
+                    amount = qty * float(product["selling_price"])
+                    profit = qty * (float(product["selling_price"]) - float(product["purchase_price"]))
+                    total_amount += amount
+                    
+                    formatted_cart.append({
+                        "product_id": product["id"],
+                        "quantity": qty,
+                        "amount": round(amount, 2),
+                        "profit": round(profit, 2)
+                    })
+                
+                success = record_multiple_sales(session["user_id"], formatted_cart)
+                if success:
+                    flash(f'Sale completed successfully! Total: ₹{total_amount:.2f}', "success")
+                    return {"success": True, "redirect": url_for("dashboard")}
+                else:
+                    return {"success": False, "error": "Sale failed due to a stock conflict. Please refresh and try again."}, 409
+            except Exception as e:
+                return {"success": False, "error": "An error occurred during processing."}, 500
         else:
-            flash("Sale failed — stock may have changed. Please try again.", "error")
+            flash("Invalid request format.", "error")
             return redirect(url_for("sell_product"))
 
     return render_template("sell.html", products=get_all_products(session["user_id"]))
