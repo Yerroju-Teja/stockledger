@@ -694,7 +694,8 @@
 <body>
 
     <nav>
-        <a href="/" class="nav-brand">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="/" class="nav-brand">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor" />
                 <rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5" />
@@ -703,6 +704,8 @@
             </svg>
             StockLedger
         </a>
+        <a href="https://portfolio-alpha-jade-83.vercel.app/" target="_blank" style="font-size: 12px; padding: 4px 10px; background: var(--accent); color: #0d0f14; border-radius: 6px; text-decoration: none; font-weight: 600;">My Portfolio</a>
+        </div>
         <div class="nav-actions">
             <a href="{{ url_for('login') }}" class="nav-link">Sign in</a>
             <a href="{{ url_for('signup') }}" class="nav-btn">Get started free</a>
