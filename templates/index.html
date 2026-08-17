@@ -1,930 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StockLedger — Smart Inventory Management</title>
-    <meta name="description"
-        content="StockLedger helps you manage inventory, track sales, and monitor profits — all in one place.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap"
-        rel="stylesheet">
+    <meta name="description" content="StockLedger helps you manage inventory, track sales, and monitor profits — all in one place.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
         :root {
-            --bg: #0d0f14;
-            --bg2: #13161e;
-            --bg3: #1a1e2a;
-            --border: #252a38;
-            --border2: #2e3449;
-            --text: #e8eaf0;
-            --muted: #7a8199;
-            --accent: #f0a500;
-            --accent2: #f7c948;
-            --danger: #e05c5c;
-            --success: #3fcb7f;
-            --info: #5b8dee;
-            --font: 'DM Sans', sans-serif;
-            --mono: 'DM Mono', monospace;
-            --radius: 10px;
-            --radius-lg: 16px;
+            --bg: #f4f6f8;
+            --bg-card: #ffffff;
+            --text-main: #111111;
+            --text-muted: #6c757d;
+            --border: rgba(0,0,0,0.06);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
         body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--font);
-            font-size: 15px;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
             line-height: 1.6;
             overflow-x: hidden;
         }
 
+        /* Subtle Light Grid Background */
         body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
+            content: ''; position: fixed; inset: 0;
             background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-            background-size: 52px 52px;
-            opacity: .25;
-            pointer-events: none;
-            z-index: 0;
+            background-size: 40px 40px; opacity: 0.5; pointer-events: none; z-index: -1;
         }
 
-        /* NAV */
+        /* Navbar */
         nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            padding: 0 48px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: color-mix(in srgb, var(--bg) 80%, transparent);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 0 5%; height: 72px; display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
         }
 
         .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 17px;
-            font-weight: 600;
-            color: var(--accent);
-            letter-spacing: .02em;
-            text-decoration: none;
+            display: flex; align-items: center; gap: 8px; font-size: 1.1rem;
+            font-weight: 700; color: var(--text-main); text-decoration: none; letter-spacing: -0.02em;
         }
 
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .nav-links { display: flex; align-items: center; gap: 16px; }
+        
         .nav-link {
-            color: var(--muted);
-            text-decoration: none;
-            font-size: 14px;
-            padding: 7px 16px;
-            border-radius: 8px;
-            transition: all .18s;
+            color: var(--text-muted); text-decoration: none; font-size: 0.9rem;
+            font-weight: 500; transition: color 0.2s;
+        }
+        .nav-link:hover { color: var(--text-main); }
+
+        .curvy-btn {
+            background-color: #000000; color: #ffffff; border-radius: 12px;
+            padding: 0.6rem 1.25rem; font-weight: 600; text-decoration: none; font-size: 0.9rem;
+            transition: all 0.2s ease; border: 1px solid #000;
+        }
+        .curvy-btn:hover {
+            background-color: #1a1a1a; transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: #fff;
         }
 
-        .nav-link:hover {
-            color: var(--text);
-            background: var(--bg3);
+        .ghost-btn {
+            background-color: transparent; color: var(--text-main); border-radius: 12px;
+            padding: 0.6rem 1.25rem; font-weight: 600; text-decoration: none; font-size: 0.9rem;
+            transition: all 0.2s ease; border: 1px solid #e5e7eb;
         }
+        .ghost-btn:hover { background-color: #f8f9fa; border-color: #d1d5db; }
 
-        .nav-btn {
-            background: var(--accent);
-            color: #0d0f14;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 8px 20px;
-            border-radius: 9px;
-            text-decoration: none;
-            transition: all .18s;
-        }
-
-        .nav-btn:hover {
-            background: var(--accent2);
-            transform: translateY(-1px);
-        }
-
-        /* HERO */
+        /* Hero Section */
         .hero {
-            position: relative;
-            z-index: 1;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 100px 24px 80px;
-        }
-
-        .glow-top {
-            position: absolute;
-            top: -10%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 800px;
-            height: 500px;
-            background: radial-gradient(ellipse, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 65%);
-            pointer-events: none;
-            animation: breathe 5s ease-in-out infinite;
-        }
-
-        .glow-left {
-            position: absolute;
-            top: 40%;
-            left: -10%;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(ellipse, color-mix(in srgb, var(--info) 5%, transparent) 0%, transparent 65%);
-            pointer-events: none;
-        }
-
-        .glow-right {
-            position: absolute;
-            top: 50%;
-            right: -10%;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(ellipse, color-mix(in srgb, var(--success) 5%, transparent) 0%, transparent 65%);
-            pointer-events: none;
-        }
-
-        @keyframes breathe {
-
-            0%,
-            100% {
-                opacity: .7;
-                transform: translateX(-50%) scale(1);
-            }
-
-            50% {
-                opacity: 1;
-                transform: translateX(-50%) scale(1.1);
-            }
+            position: relative; z-index: 1; min-height: 90vh; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 120px 5% 80px;
         }
 
         .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: color-mix(in srgb, var(--accent) 10%, transparent);
-            border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
-            color: var(--accent);
-            font-size: 12px;
-            font-weight: 500;
-            letter-spacing: .04em;
-            text-transform: uppercase;
-            padding: 6px 16px;
-            border-radius: 999px;
-            margin-bottom: 28px;
-            animation: rise .6s ease both;
-        }
-
-        .badge-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--accent);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: .3;
-            }
+            display: inline-flex; align-items: center; gap: 8px;
+            background: #ffffff; border: 1px solid var(--border);
+            color: var(--text-main); font-size: 0.75rem; font-weight: 600;
+            letter-spacing: 0.04em; text-transform: uppercase;
+            padding: 0.5rem 1rem; border-radius: 999px; margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
         .hero h1 {
-            font-size: clamp(36px, 7vw, 76px);
-            font-weight: 700;
-            line-height: 1.1;
-            letter-spacing: -.02em;
-            margin-bottom: 24px;
-            animation: rise .6s .1s ease both;
-        }
-
-        .hero h1 span {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, #ff9d00 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800;
+            line-height: 1.1; letter-spacing: -0.04em; margin-bottom: 1.5rem;
+            color: var(--text-main); max-width: 900px;
         }
 
         .hero-sub {
-            font-size: clamp(15px, 2vw, 19px);
-            color: var(--muted);
-            font-weight: 300;
-            max-width: 540px;
-            margin: 0 auto 40px;
-            line-height: 1.7;
-            animation: rise .6s .2s ease both;
+            font-size: clamp(1rem, 1.5vw, 1.25rem); color: var(--text-muted);
+            font-weight: 400; max-width: 600px; margin: 0 auto 2.5rem; line-height: 1.6;
         }
 
-        .hero-actions {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-            justify-content: center;
-            animation: rise .6s .3s ease both;
+        .hero-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--bg-card); border-radius: 28px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.04); padding: 3rem;
+            border: 1px solid var(--border); position: relative; overflow: hidden;
+            transition: transform 0.3s ease;
         }
+        .glass-card:hover { transform: translateY(-4px); }
 
-        .btn-hero {
-            padding: 14px 32px;
-            border-radius: var(--radius);
-            font-family: var(--font);
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            border: none;
-            transition: all .2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-hero.primary {
-            background: var(--accent);
-            color: #0d0f14;
-        }
-
-        .btn-hero.primary:hover {
-            background: var(--accent2);
-            transform: translateY(-2px);
-            box-shadow: 0 12px 32px color-mix(in srgb, var(--accent) 25%, transparent);
-        }
-
-        .btn-hero.ghost {
-            background: transparent;
-            color: var(--muted);
-            border: 1px solid var(--border2);
-        }
-
-        .btn-hero.ghost:hover {
-            color: var(--text);
-            border-color: var(--muted);
-            background: var(--bg3);
-        }
-
-        @keyframes rise {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .hero-stats {
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            margin-top: 56px;
-            flex-wrap: wrap;
-            justify-content: center;
-            animation: rise .6s .4s ease both;
-        }
-
-        .hero-stat {
-            text-align: center;
-        }
-
-        .hero-stat .num {
-            font-family: var(--mono);
-            font-size: 26px;
-            font-weight: 500;
-            color: var(--text);
-        }
-
-        .hero-stat .lbl {
-            font-size: 12px;
-            color: var(--muted);
-            margin-top: 2px;
-            text-transform: uppercase;
-            letter-spacing: .04em;
-        }
-
-        .stat-div {
-            width: 1px;
-            height: 36px;
-            background: var(--border);
-        }
-
-        /* PREVIEW */
-        .preview-wrap {
-            position: relative;
-            z-index: 1;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 24px 100px;
-            animation: rise .7s .5s ease both;
-        }
-
-        .preview-label {
-            text-align: center;
-            font-size: 13px;
-            color: var(--muted);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .preview-label::before,
-        .preview-label::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        .preview-card {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 32px 80px rgba(0, 0, 0, .4);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .preview-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            opacity: .4;
-        }
-
-        .mock-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        @media(max-width:600px) {
-            .mock-stats {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .mock-stat {
-            background: var(--bg3);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-        }
-
-        .mock-stat .ml {
-            font-size: 10px;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: .05em;
-            margin-bottom: 10px;
-        }
-
-        .mock-stat .mv {
-            font-family: var(--mono);
-            font-size: 22px;
-            font-weight: 600;
-            line-height: 1;
-        }
-
-        .mock-body {
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 12px;
-        }
-
-        @media(max-width:700px) {
-            .mock-body {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .mock-table-card,
-        .mock-actions {
-            background: var(--bg3);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .mock-table-hdr {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            font-size: 12px;
-            font-weight: 500;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .mock-row {
-            padding: 11px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 13px;
-        }
-
-        .mock-row:last-child {
-            border-bottom: none;
-        }
-
-        .mock-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 8px;
-            display: inline-block;
-        }
-
-        .mock-action-row {
-            padding: 13px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 13px;
-        }
-
-        .mock-action-row:last-child {
-            border-bottom: none;
-        }
-
-        .mock-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        /* FEATURES */
-        .section {
-            position: relative;
-            z-index: 1;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 80px 24px;
-        }
-
-        .section-tag {
-            display: inline-block;
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            margin-bottom: 14px;
-            border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
-            padding: 4px 12px;
-            border-radius: 999px;
-        }
-
-        .section-title {
-            font-size: clamp(24px, 4vw, 40px);
-            font-weight: 700;
-            letter-spacing: -.01em;
-            margin-bottom: 14px;
-            line-height: 1.2;
-        }
-
-        .section-sub {
-            font-size: 16px;
-            color: var(--muted);
-            font-weight: 300;
-            max-width: 480px;
-            line-height: 1.7;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-top: 52px;
-        }
-
-        @media(max-width:900px) {
-            .features-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media(max-width:560px) {
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .feature-card {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            transition: border-color .2s, transform .2s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--card-color, var(--border)), transparent);
-            opacity: 0;
-            transition: .2s;
-        }
-
-        .feature-card:hover {
-            border-color: var(--border2);
-            transform: translateY(-3px);
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
-        }
-
+        /* Features */
+        .section-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -0.03em; text-align: center; margin-bottom: 1rem; }
+        .section-sub { text-align: center; color: var(--text-muted); font-size: 1.1rem; margin-bottom: 4rem; }
+        
         .feature-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 18px;
+            width: 48px; height: 48px; border-radius: 14px; background: #f8f9fa;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;
+            color: var(--text-main); border: 1px solid var(--border);
         }
 
-        .feature-card h3 {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .feature-card p {
-            font-size: 14px;
-            color: var(--muted);
-            line-height: 1.6;
-            font-weight: 300;
-        }
-
-        /* CTA */
-        .cta-section {
-            position: relative;
-            z-index: 1;
-            margin: 0 24px 100px;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 64px 40px;
-            text-align: center;
-            overflow: hidden;
-        }
-
-        .cta-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 600px;
-            height: 400px;
-            background: radial-gradient(ellipse, color-mix(in srgb, var(--accent) 8%, transparent) 0%, transparent 65%);
-            pointer-events: none;
-        }
-
-        .cta-section h2 {
-            font-size: clamp(24px, 4vw, 40px);
-            font-weight: 700;
-            letter-spacing: -.01em;
-            margin-bottom: 14px;
-            position: relative;
-        }
-
-        .cta-section p {
-            font-size: 16px;
-            color: var(--muted);
-            font-weight: 300;
-            margin-bottom: 36px;
-            position: relative;
-        }
-
-        .cta-actions {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            flex-wrap: wrap;
-            position: relative;
-        }
-
-        /* FOOTER */
+        /* Footer */
         footer {
-            position: relative;
-            z-index: 1;
-            border-top: 1px solid var(--border);
-            padding: 32px 48px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .foot-brand {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--accent);
-        }
-
-        .foot-copy {
-            font-size: 13px;
-            color: var(--muted);
+            border-top: 1px solid var(--border); padding: 2rem 5%;
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--bg-card); position: relative; z-index: 1;
         }
     </style>
 </head>
-
 <body>
 
     <nav>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <a href="/" class="nav-brand">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor" />
-                <rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5" />
-                <rect x="2" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".5" />
-                <rect x="11" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".25" />
+        <a href="/" class="nav-brand">
+            <svg width="24" height="24" viewBox="0 0 20 20" fill="none">
+                <rect x="2" y="2" width="7" height="7" rx="2" fill="#111111"/>
+                <rect x="11" y="2" width="7" height="7" rx="2" fill="#111111" opacity=".5"/>
+                <rect x="2" y="11" width="7" height="7" rx="2" fill="#111111" opacity=".5"/>
+                <rect x="11" y="11" width="7" height="7" rx="2" fill="#111111" opacity=".25"/>
             </svg>
             StockLedger
         </a>
-        <a href="https://portfolio-alpha-jade-83.vercel.app/" target="_blank" style="font-size: 12px; padding: 4px 10px; background: var(--accent); color: #0d0f14; border-radius: 6px; text-decoration: none; font-weight: 600;">My Portfolio</a>
-        </div>
-        <div class="nav-actions">
-            <a href="{{ url_for('login') }}" class="nav-link">Sign in</a>
-            <a href="{{ url_for('signup') }}" class="nav-btn">Get started free</a>
+        <div class="nav-links">
+            <a href="https://portfolio-alpha-jade-83.vercel.app/" target="_blank" class="nav-link d-none d-sm-block">Creator Portfolio</a>
+            <a href="{{ url_for('login') }}" class="nav-link fw-bold">Sign In</a>
+            <a href="{{ url_for('signup') }}" class="curvy-btn">Get Started</a>
         </div>
     </nav>
 
     <section class="hero">
-        <div class="glow-top"></div>
-        <div class="glow-left"></div>
-        <div class="glow-right"></div>
-
         <div class="hero-badge">
-            <span class="badge-dot"></span>
-            Inventory Management, Simplified
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            Smart Inventory Management
         </div>
 
-        <h1>Your entire stock.<br><span>One smart ledger.</span></h1>
-        <p class="hero-sub">Track inventory, record sales, monitor profits, and get low-stock alerts — all from a
-            single, beautiful dashboard.</p>
+        <h1>Your entire stock.<br>One minimal ledger.</h1>
+        <p class="hero-sub">Track inventory, record seamless POS sales, monitor profits, and get low-stock alerts — all from a single, beautifully designed dashboard.</p>
 
         <div class="hero-actions">
-            <a href="{{ url_for('signup') }}" class="btn-hero primary">
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                    <path d="M7.5 1v13M1 7.5h13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                </svg>
-                Start for free
-            </a>
-            <a href="{{ url_for('login') }}" class="btn-hero ghost">Sign in →</a>
-        </div>
-
-        <div class="hero-stats">
-            <div class="hero-stat">
-                <div class="num">100%</div>
-                <div class="lbl">Free to use</div>
-            </div>
-            <div class="stat-div"></div>
-            <div class="hero-stat">
-                <div class="num">Multi</div>
-                <div class="lbl">User support</div>
-            </div>
-            <div class="stat-div"></div>
-            <div class="hero-stat">
-                <div class="num">Live</div>
-                <div class="lbl">Stock alerts</div>
-            </div>
-            <div class="stat-div"></div>
-            <div class="hero-stat">
-                <div class="num">₹ P&L</div>
-                <div class="lbl">Reports & charts</div>
-            </div>
+            <a href="{{ url_for('signup') }}" class="curvy-btn" style="padding: 0.8rem 1.75rem; font-size: 1.05rem;">Start for free</a>
+            <a href="{{ url_for('login') }}" class="ghost-btn" style="padding: 0.8rem 1.75rem; font-size: 1.05rem;">View Dashboard</a>
         </div>
     </section>
 
-    <div class="preview-wrap">
-        <p class="preview-label">Dashboard preview</p>
-        <div class="preview-card">
-            <div class="mock-stats">
-                <div class="mock-stat">
-                    <div class="ml">Total Products</div>
-                    <div class="mv" style="color:var(--accent)">48</div>
-                </div>
-                <div class="mock-stat">
-                    <div class="ml">Inventory Value</div>
-                    <div class="mv" style="color:var(--info)">₹1.2L</div>
-                </div>
-                <div class="mock-stat">
-                    <div class="ml">Today's Sales</div>
-                    <div class="mv" style="color:var(--success)">₹8,400</div>
-                </div>
-                <div class="mock-stat">
-                    <div class="ml">Low Stock Items</div>
-                    <div class="mv" style="color:var(--danger)">3</div>
-                </div>
-            </div>
-            <div class="mock-body">
-                <div class="mock-table-card">
-                    <div class="mock-table-hdr"><span>Low Stock Alerts</span><span
-                            style="font-size:11px;color:var(--accent)">View all</span></div>
-                    <div class="mock-row"><span><span class="mock-dot" style="background:var(--danger)"></span>Basmati
-                            Rice 1kg</span><span
-                            style="font-size:11px;color:var(--danger);font-family:var(--mono);background:color-mix(in srgb,var(--danger) 12%,transparent);padding:2px 8px;border-radius:999px;">2
-                            left</span></div>
-                    <div class="mock-row"><span><span class="mock-dot" style="background:var(--danger)"></span>Sunflower
-                            Oil 1L</span><span
-                            style="font-size:11px;color:var(--danger);font-family:var(--mono);background:color-mix(in srgb,var(--danger) 12%,transparent);padding:2px 8px;border-radius:999px;">4
-                            left</span></div>
-                    <div class="mock-row"><span><span class="mock-dot" style="background:var(--accent)"></span>Toor Dal
-                            500g</span><span
-                            style="font-size:11px;color:var(--accent);font-family:var(--mono);background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:999px;">5
-                            left</span></div>
-                </div>
-                <div class="mock-actions">
-                    <div class="mock-table-hdr"><span>Quick Actions</span></div>
-                    <div class="mock-action-row">
-                        <div class="mock-icon" style="background:color-mix(in srgb,var(--accent) 14%,transparent);">➕
-                        </div>
-                        <div>
-                            <div style="font-weight:500;font-size:13px;">Add Product</div>
-                            <div style="font-size:11px;color:var(--muted);">Register new item</div>
-                        </div>
+    <section class="container mb-5 pb-5">
+        <h2 class="section-title">Everything you need. Nothing you don't.</h2>
+        <p class="section-sub">Built specifically for small businesses looking for speed and clarity.</p>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="glass-card h-100">
+                    <div class="feature-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                     </div>
-                    <div class="mock-action-row">
-                        <div class="mock-icon" style="background:color-mix(in srgb,var(--success) 14%,transparent);">💰
-                        </div>
-                        <div>
-                            <div style="font-weight:500;font-size:13px;">Record Sale</div>
-                            <div style="font-size:11px;color:var(--muted);">Log a product sale</div>
-                        </div>
+                    <h5 class="fw-bold">Live Dashboard</h5>
+                    <p class="text-muted small mb-0">See your total products, inventory value, today's sales and profit at a glance — always up to date.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card h-100">
+                    <div class="feature-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31"></path><path d="M14 9.3V1.99"></path><path d="M8.5 2h7"></path><path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path><path d="M5.52 16h12.96"></path></svg>
                     </div>
-                    <div class="mock-action-row">
-                        <div class="mock-icon" style="background:color-mix(in srgb,var(--info) 14%,transparent);">📊
-                        </div>
-                        <div>
-                            <div style="font-weight:500;font-size:13px;">View Reports</div>
-                            <div style="font-size:11px;color:var(--muted);">Sales & profit charts</div>
-                        </div>
+                    <h5 class="fw-bold">Low Stock Alerts</h5>
+                    <p class="text-muted small mb-0">Set a minimum threshold per product. Get instant visual alerts when stock drops below your limit.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card h-100">
+                    <div class="feature-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
                     </div>
+                    <h5 class="fw-bold">Fast POS System</h5>
+                    <p class="text-muted small mb-0">Log every sale instantly through an intuitive cart. Quantity, amount, and profit are calculated automatically.</p>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <section class="section">
-        <div class="section-tag">Features</div>
-        <h2 class="section-title">Everything you need to<br>run your inventory</h2>
-        <p class="section-sub">Built for small businesses, shops, and anyone who needs to keep track of stock and sales.
-        </p>
-        <div class="features-grid">
-            <div class="feature-card" style="--card-color:var(--accent)">
-                <div class="feature-icon" style="background:color-mix(in srgb,var(--accent) 14%,transparent);">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <rect x="2" y="2" width="7" height="7" rx="2" fill="#f0a500" />
-                        <rect x="11" y="2" width="7" height="7" rx="2" fill="#f0a500" opacity=".5" />
-                        <rect x="2" y="11" width="7" height="7" rx="2" fill="#f0a500" opacity=".5" />
-                        <rect x="11" y="11" width="7" height="7" rx="2" fill="#f0a500" opacity=".25" />
-                    </svg>
-                </div>
-                <h3>Live Dashboard</h3>
-                <p>See your total products, inventory value, today's sales and profit at a glance — always up to date.
-                </p>
-            </div>
-            <div class="feature-card" style="--card-color:var(--danger)">
-                <div class="feature-icon" style="background:color-mix(in srgb,var(--danger) 14%,transparent);">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M10 3v7m0 4v.5" stroke="#e05c5c" stroke-width="1.8" stroke-linecap="round" />
-                        <circle cx="10" cy="10" r="8" stroke="#e05c5c" stroke-width="1.6" />
-                    </svg>
-                </div>
-                <h3>Low Stock Alerts</h3>
-                <p>Set a minimum threshold per product. Get instant alerts when stock drops below your limit.</p>
-            </div>
-            <div class="feature-card" style="--card-color:var(--success)">
-                <div class="feature-icon" style="background:color-mix(in srgb,var(--success) 14%,transparent);">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M3 10l4 4 10-8" stroke="#3fcb7f" stroke-width="1.8" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <h3>Sales Recording</h3>
-                <p>Log every sale instantly. Quantity, amount, and profit are calculated and saved automatically.</p>
-            </div>
-            <div class="feature-card" style="--card-color:var(--info)">
-                <div class="feature-icon" style="background:color-mix(in srgb,var(--info) 14%,transparent);">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M3 15l4-5 4 3 5-8" stroke="#5b8dee" stroke-width="1.8" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <h3>Reports & Charts</h3>
-                <p>Revenue over time, top products by sales, profit margins — all in interactive charts.</p>
-            </div>
-            <div class="feature-card" style="--card-color:#a855f7">
-                <div class="feature-icon" style="background:color-mix(in srgb,#a855f7 14%,transparent);">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <circle cx="8" cy="7" r="4" stroke="#a855f7" stroke-width="1.6" />
-                        <path d="M2 17c0-3 2.5-5 6-5s6 2 6 5" stroke="#a855f7" stroke-width="1.6"
-                            stroke-linecap="round" />
-                        <path d="M14 3a4 4 0 010 8M17 17c0-2.5-1.5-4.5-4-5" stroke="#a855f7" stroke-width="1.6"
-                            stroke-linecap="round" />
-                    </svg>
-                </div>
-                <h3>Multi-User Support</h3>
-                <p>Each user gets their own isolated inventory. Your data is private and separate from others.</p>
-            </div>
-            <div class="feature-card" style="--card-color:var(--accent2)">
-                <div class="feature-icon" style="background:color-mix(in srgb,var(--accent2) 14%,transparent);">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <rect x="3" y="3" width="14" height="14" rx="3" stroke="#f7c948" stroke-width="1.6" />
-                        <path d="M7 10h6M7 7h6M7 13h4" stroke="#f7c948" stroke-width="1.4" stroke-linecap="round" />
-                    </svg>
-                </div>
-                <h3>Product Management</h3>
-                <p>Add, edit, filter, and sort products. Search by name or category. Paginated for large catalogs.</p>
             </div>
         </div>
     </section>
-
-    <div class="cta-section">
-        <h2>Ready to take control of your inventory?</h2>
-        <p>Sign up for free — no credit card, no setup fees. Just you and your stock.</p>
-        <div class="cta-actions">
-            <a href="{{ url_for('signup') }}" class="btn-hero primary">Create free account →</a>
-            <a href="{{ url_for('login') }}" class="btn-hero ghost">Already have an account</a>
-        </div>
-    </div>
 
     <footer>
-        <div class="foot-brand">
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                <rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor" />
-                <rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5" />
-                <rect x="2" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".5" />
-                <rect x="11" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".25" />
-            </svg>
+        <div class="nav-brand fs-6">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="#111111"/><rect x="11" y="2" width="7" height="7" rx="2" fill="#111111" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="#111111" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="#111111" opacity=".25"/></svg>
             StockLedger
         </div>
-        <div class="foot-copy">© 2026 — Built by Naga Satya Teja Yerroju</div>
+        <div class="text-muted small fw-medium">© 2026 — Built by Naga Satya Teja Yerroju</div>
     </footer>
 
 </body>
-
 </html>
