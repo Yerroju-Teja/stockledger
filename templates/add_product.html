@@ -1,189 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Product | StockLedger</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-    --bg:#0d0f14; --bg2:#13161e; --bg3:#1a1e2a;
-    --border:#252a38; --border2:#2e3449;
-    --text:#e8eaf0; --muted:#7a8199;
-    --accent:#f0a500; --accent2:#f7c948;
-    --danger:#e05c5c; --success:#3fcb7f;
-    --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
-    --radius:10px; --radius-lg:16px;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:15px; line-height:1.6; min-height:100vh; }
-.nav { position:sticky; top:0; z-index:100; background:var(--bg2); border-bottom:1px solid var(--border); padding:0 32px; display:flex; align-items:center; justify-content:space-between; height:60px; }
-.nav-brand { font-size:16px; font-weight:600; color:var(--accent); letter-spacing:.02em; display:flex; align-items:center; gap:8px; }
-.nav-links { display:flex; align-items:center; gap:4px; }
-.nav-links a { color:var(--muted); text-decoration:none; font-size:14px; padding:6px 14px; border-radius:8px; transition:all .18s; }
-.nav-links a:hover,.nav-links a.active { color:var(--text); background:var(--bg3); }
-.nav-links .logout { color:var(--danger); border:1px solid color-mix(in srgb,var(--danger) 25%,transparent); margin-left:8px; }
-.nav-links .logout:hover { background:color-mix(in srgb,var(--danger) 12%,transparent); }
-.page { max-width:800px; margin:0 auto; padding:40px 32px; animation:rise .35s ease both; }
-@keyframes rise { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product | StockLedger</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #f4f6f8; color: #111111; overflow-x: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; height: calc(100vh - 2rem); position: fixed; top: 1rem; left: 1rem; background: #ffffff; border-radius: 24px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; padding: 2rem 1.25rem; border: 1px solid rgba(0,0,0,0.02); z-index: 1000; }
+        .brand-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.04); padding-left: 0.5rem; }
+        .user-profile { text-align: center; margin-bottom: 2.5rem; }
+        .user-avatar { width: 56px; height: 56px; border-radius: 18px; background-color: #f1f3f5; color: #111; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; margin: 0 auto 1rem auto; }
+        .nav-link { color: #6c757d; font-weight: 500; padding: 0.8rem 1rem; border-radius: 14px; margin-bottom: 0.35rem; transition: all 0.25s ease; display: flex; align-items: center; gap: 12px; }
+        .nav-link svg { color: #adb5bd; transition: all 0.25s ease; }
+        .nav-link:hover { background-color: #f8f9fa; color: #111; }
+        .nav-link:hover svg { color: #111; }
+        .nav-link.active { background-color: #111111; color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        .nav-link.active svg { color: #ffffff; }
+        .nav-logout { background-color: #fff0f0; color: #e53e3e; font-weight: 600; }
+        .nav-logout svg { color: #e53e3e; }
+        .nav-logout:hover { background-color: #fee2e2; color: #c53030; }
 
-.breadcrumb { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); margin-bottom:28px; }
-.breadcrumb a { color:var(--muted); text-decoration:none; }
-.breadcrumb a:hover { color:var(--accent); }
-.breadcrumb .sep { opacity:.4; }
-.breadcrumb .current { color:var(--text); }
-
-.card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
-.card-header { padding:22px 28px; border-bottom:1px solid var(--border); }
-.card-header h1 { font-size:20px; font-weight:600; }
-.card-header p { font-size:13px; color:var(--muted); margin-top:3px; }
-.card-body { padding:28px; }
-
-.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-.full { grid-column:1/-1; }
-@media(max-width:600px){ .form-grid{grid-template-columns:1fr;} .full{grid-column:auto;} }
-
-.form-group { display:flex; flex-direction:column; gap:7px; }
-label { font-size:12px; font-weight:500; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
-input, select {
-    padding:11px 14px; background:var(--bg3); border:1px solid var(--border2);
-    border-radius:var(--radius); color:var(--text); font-family:var(--font); font-size:14px;
-    transition:border-color .18s, box-shadow .18s;
-}
-input:focus, select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent); }
-input::placeholder { color:var(--muted); }
-select option { background:var(--bg2); }
-
-.section-divider { border:none; border-top:1px solid var(--border); margin:4px 0; grid-column:1/-1; }
-.section-label { grid-column:1/-1; font-size:11px; font-weight:500; color:var(--muted); text-transform:uppercase; letter-spacing:.07em; padding-bottom:4px; border-bottom:1px solid var(--border); }
-
-.card-footer { padding:20px 28px; border-top:1px solid var(--border); display:flex; align-items:center; gap:12px; justify-content:flex-end; }
-.btn { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; border-radius:var(--radius); border:none; font-family:var(--font); font-size:14px; font-weight:500; cursor:pointer; text-decoration:none; transition:all .18s; }
-.btn-primary { background:var(--accent); color:#0d0f14; }
-.btn-primary:hover { background:var(--accent2); }
-.btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border2); }
-.btn-ghost:hover { color:var(--text); border-color:var(--muted); background:var(--bg3); }
-
-.hint { font-size:12px; color:var(--muted); margin-top:2px; }
-footer { text-align:center; color:var(--muted); font-size:13px; padding:40px 0 24px; }
-</style>
+        /* Main */
+        .main-content { margin-left: calc(260px + 2rem); padding: 2.5rem 2.5rem 2rem 0; min-height: 100vh; }
+        
+        /* Full-width Glass Card */
+        .glass-card { background: #ffffff; border-radius: 28px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03); padding: 2.5rem; border: 1px solid rgba(0,0,0,0.02); margin-bottom: 2rem; width: 100%; }
+        
+        /* Forms & Buttons */
+        .curvy-input { border-radius: 14px; background-color: #f8f9fa; border: 2px solid transparent; padding: 0.8rem 1.2rem; color: #111; font-weight: 500; transition: all 0.25s ease; }
+        .curvy-input:focus { background-color: #ffffff; border-color: #000000; box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05); outline: none; }
+        .curvy-btn { background-color: #000000; color: #ffffff; border-radius: 14px; padding: 0.9rem 1.5rem; font-weight: 600; letter-spacing: 0.02em; border: none; transition: all 0.25s ease; }
+        .curvy-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); background-color: #1a1a1a; }
+        .btn-ghost { background: transparent; color: #111; border: 1px solid #e5e7eb; border-radius: 14px; padding: 0.9rem 1.5rem; font-weight: 600; text-decoration: none; transition: all 0.25s ease; display: inline-block; text-align: center;}
+        .btn-ghost:hover { background: #f8f9fa; border-color: #d1d5db; }
+        
+        .form-label { font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: #6c757d; margin-bottom: 0.5rem; margin-left: 0.25rem; }
+        .section-label { font-size: 0.75rem; font-weight: 700; color: #adb5bd; text-transform: uppercase; letter-spacing: 0.08em; margin: 2rem 0 1rem 0; padding-bottom: 0.5rem; border-bottom: 1px solid #f1f3f5; }
+        .minimal-alert { border-radius: 12px; border: none; background-color: #fff3cd; color: #856404; }
+        .minimal-alert.alert-danger { background-color: #f8d7da; color: #721c24; }
+    </style>
 </head>
 <body>
-<nav class="nav">
-    <div class="nav-brand">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".25"/></svg>
-        StockLedger
-        <a href="https://portfolio-alpha-jade-83.vercel.app/" target="_blank" style="font-size: 12px; padding: 4px 10px; background: var(--accent); color: #0d0f14; border-radius: 6px; text-decoration: none; font-weight: 600; margin-left: 10px;">My Portfolio</a>
-    </div>
-    <div class="nav-links">
-        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('products') }}">Products</a>
-        <a href="{{ url_for('add_product') }}" class="active">Add Product</a>
-        <a href="{{ url_for('sell_product') }}">Sell</a>
-        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
-    </div>
-</nav>
 
-<div class="page">
-    <div class="breadcrumb">
-        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-        <span class="sep">›</span>
-        <a href="{{ url_for('products') }}">Products</a>
-        <span class="sep">›</span>
-        <span class="current">Add product</span>
-    </div>
-
-    <div class="card">
-        <div class="card-header">
-            <h1>Add New Product</h1>
-            <p>Fill in the details below to register a new inventory item</p>
+    <nav class="sidebar">
+        <div class="brand-header">
+            <svg width="22" height="22" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="#111111"/><rect x="11" y="2" width="7" height="7" rx="2" fill="#111111" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="#111111" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="#111111" opacity=".25"/></svg>
+            <span class="fw-bold fs-5" style="letter-spacing: -0.02em;">StockLedger</span>
         </div>
-        <div class="card-body">
+        <div class="user-profile">
+            <div class="user-avatar">{{ session['user'][0]|upper if session.get('user') else 'U' }}</div>
+            <h5 class="fw-bold mb-0 text-truncate">{{ session.get('user', 'User') }}</h5>
+            <small class="text-muted">Administrator</small>
+        </div>
+        <ul class="nav flex-column flex-grow-1">
+            <li class="nav-item"><a href="{{ url_for('dashboard') }}" class="nav-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>Dashboard</a></li>
+            <li class="nav-item"><a href="{{ url_for('products') }}" class="nav-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>Products</a></li>
+            <li class="nav-item"><a href="{{ url_for('add_product') }}" class="nav-link active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>Add Products</a></li>
+            <li class="nav-item"><a href="{{ url_for('sell_product') }}" class="nav-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>Sell Products</a></li>
+            <li class="nav-item"><a href="{{ url_for('sales_report') }}" class="nav-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>Reports</a></li>
+        </ul>
+        <div class="mt-auto"><a href="{{ url_for('logout') }}" class="nav-link nav-logout d-flex align-items-center justify-content-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>Logout</a></div>
+    </nav>
+
+    <main class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="fw-bold mb-0 text-dark tracking-tight" style="letter-spacing: -0.03em;">Add New Product</h2>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert minimal-alert py-3 px-4 fw-medium mb-4 {{ 'alert-danger' if category == 'error' else 'alert-success' }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Removed max-width restriction for full rectangular layout -->
+        <div class="glass-card">
             <form method="POST" id="productForm">
-                <div class="form-grid">
-                    <div class="form-group full">
-                        <label>Product Name</label>
-                        <input type="text" name="name" placeholder="e.g. Basmati Rice 1kg" required>
+                <div class="row g-4">
+                    <div class="col-12">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-control form-control-lg curvy-input" name="name" placeholder="e.g. Premium Coffee Beans" required>
                     </div>
-                    <div class="form-group">
-                        <label>Category</label>
-                        <input type="text" name="category" placeholder="e.g. Grains" required>
+                    <div class="col-md-6">
+                        <label class="form-label">Category</label>
+                        <input type="text" class="form-control form-control-lg curvy-input" name="category" placeholder="e.g. Beverages" required>
                     </div>
-                    <div class="form-group">
-                        <label>Unit</label>
-                        <select name="unit" required>
-                            <option value="">— Select unit —</option>
+                    <div class="col-md-6">
+                        <label class="form-label">Display Unit</label>
+                        <select class="form-select form-select-lg curvy-input" name="unit" required>
+                            <option value="">— Select Unit —</option>
                             <option value="Kg">Kilogram (Kg)</option>
-                            <option value="Gram">Gram</option>
-                            <option value="Litre">Litre</option>
+                            <option value="Gram">Gram (g)</option>
+                            <option value="Litre">Litre (L)</option>
                             <option value="Piece">Piece / Packet</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Net Weight</label>
-                        <input type="number" step="0.01" min="0" name="net_weight" placeholder="0.00" required>
-                        <span class="hint">Per unit weight or volume</span>
+
+                    <div class="col-12"><div class="section-label">Inventory & Stock Alerts</div></div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label">Net Weight/Vol</label>
+                        <input type="number" step="0.01" min="0" class="form-control form-control-lg curvy-input" name="net_weight" placeholder="0.00" required>
                     </div>
-                    <div class="form-group">
-                        <label>Quantity in Stock</label>
-                        <input type="number" step="0.01" min="0" name="quantity" placeholder="0" required>
+                    <div class="col-md-4">
+                        <label class="form-label">Initial Quantity</label>
+                        <input type="number" step="0.01" min="0" class="form-control form-control-lg curvy-input" name="quantity" placeholder="0" required>
                     </div>
-                    <div class="form-group">
-                        <label>Minimum Stock Alert</label>
-                        <input type="number" min="0" name="min_stock" placeholder="5" value="5" required>
-                        <span class="hint">Alert when qty drops below this</span>
+                    <div class="col-md-4">
+                        <label class="form-label">Min. Stock Alert</label>
+                        <input type="number" min="0" class="form-control form-control-lg curvy-input" name="min_stock" placeholder="5" value="5" required>
                     </div>
-                    <div class="form-group">
-                        <label>Purchase Price (₹)</label>
-                        <input type="number" step="0.01" min="0" name="purchase_price" placeholder="0.00" required>
+
+                    <div class="col-12"><div class="section-label">Pricing</div></div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Purchase Price (₹)</label>
+                        <input type="number" step="0.01" min="0" class="form-control form-control-lg curvy-input" name="purchase_price" id="pp" placeholder="0.00" required>
                     </div>
-                    <div class="form-group">
-                        <label>Selling Price (₹)</label>
-                        <input type="number" step="0.01" min="0" name="selling_price" placeholder="0.00" required>
+                    <div class="col-md-6">
+                        <label class="form-label">Selling Price (₹)</label>
+                        <input type="number" step="0.01" min="0" class="form-control form-control-lg curvy-input" name="selling_price" id="sp" placeholder="0.00" required>
                     </div>
-                    <div class="form-group full" id="marginPreview" style="display:none;">
-                        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:14px 18px;display:flex;gap:32px;">
-                            <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Margin per unit</div><div id="marginAmt" style="font-size:18px;font-weight:600;font-family:var(--mono);color:var(--success);">₹0</div></div>
-                            <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Margin %</div><div id="marginPct" style="font-size:18px;font-weight:600;font-family:var(--mono);color:var(--accent);">0%</div></div>
+                    
+                    <!-- Live Margin Preview -->
+                    <div class="col-12" id="marginPreview" style="display:none;">
+                        <div class="p-4 rounded-4" style="background-color: #f8f9fa; border: 1px solid #e5e7eb; display: flex; gap: 3rem;">
+                            <div>
+                                <div class="form-label mb-1">Projected Margin</div>
+                                <div id="marginAmt" class="fw-bold" style="font-size: 1.5rem; color: #10b981;">₹0</div>
+                            </div>
+                            <div>
+                                <div class="form-label mb-1">Profit %</div>
+                                <div id="marginPct" class="fw-bold" style="font-size: 1.5rem; color: #111;">0%</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="card-footer" style="padding:20px 0 0;margin-top:28px;border-top:1px solid var(--border);">
-                    <a href="{{ url_for('products') }}" class="btn btn-ghost">Cancel</a>
-                    <button type="submit" class="btn btn-primary">
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-                        Save Product
-                    </button>
+
+                <div class="d-flex justify-content-between align-items-center mt-5 pt-4" style="border-top: 1px solid #f1f3f5;">
+                    <a href="{{ url_for('products') }}" class="btn-ghost px-4">Cancel</a>
+                    <button type="submit" class="curvy-btn px-5">Save Product</button>
                 </div>
             </form>
         </div>
-    </div>
-</div>
-<footer>StockLedger © 2026 — Inventory Management System By Naga Satya Teja Yerroju</footer>
+    </main>
 
-<script>
-const pp = document.querySelector('[name=purchase_price]');
-const sp = document.querySelector('[name=selling_price]');
-const preview = document.getElementById('marginPreview');
-const marginAmt = document.getElementById('marginAmt');
-const marginPct = document.getElementById('marginPct');
-function updateMargin(){
-    const p = parseFloat(pp.value)||0;
-    const s = parseFloat(sp.value)||0;
-    if(p>0 && s>0){
-        preview.style.display='block';
-        const m = s - p;
-        const pct = (m/p*100);
-        marginAmt.textContent = '₹' + m.toFixed(2);
-        marginAmt.style.color = m>=0 ? 'var(--success)' : 'var(--danger)';
-        marginPct.textContent = pct.toFixed(1) + '%';
-        marginPct.style.color = m>=0 ? 'var(--accent)' : 'var(--danger)';
-    } else { preview.style.display='none'; }
-}
-pp.addEventListener('input', updateMargin);
-sp.addEventListener('input', updateMargin);
-</script>
+    <script>
+        const pp = document.getElementById('pp');
+        const sp = document.getElementById('sp');
+        const preview = document.getElementById('marginPreview');
+        const marginAmt = document.getElementById('marginAmt');
+        const marginPct = document.getElementById('marginPct');
+        
+        function updateMargin(){
+            const p = parseFloat(pp.value)||0;
+            const s = parseFloat(sp.value)||0;
+            if(p>0 && s>0){
+                preview.style.display='block';
+                const m = s - p;
+                const pct = (m/p*100);
+                marginAmt.textContent = '₹' + m.toFixed(2);
+                marginAmt.style.color = m>=0 ? '#10b981' : '#ef4444';
+                marginPct.textContent = pct.toFixed(1) + '%';
+            } else { preview.style.display='none'; }
+        }
+        pp.addEventListener('input', updateMargin);
+        sp.addEventListener('input', updateMargin);
+    </script>
 </body>
 </html>

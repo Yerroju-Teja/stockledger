@@ -1,214 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Products | StockLedger</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-    --bg:#0d0f14; --bg2:#13161e; --bg3:#1a1e2a;
-    --border:#252a38; --border2:#2e3449;
-    --text:#e8eaf0; --muted:#7a8199;
-    --accent:#f0a500; --accent2:#f7c948;
-    --danger:#e05c5c; --success:#3fcb7f; --info:#5b8dee;
-    --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
-    --radius:10px; --radius-lg:16px;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:15px; line-height:1.6; min-height:100vh; }
-.nav { position:sticky; top:0; z-index:100; background:var(--bg2); border-bottom:1px solid var(--border); padding:0 32px; display:flex; align-items:center; justify-content:space-between; height:60px; }
-.nav-brand { font-size:16px; font-weight:600; color:var(--accent); letter-spacing:.02em; display:flex; align-items:center; gap:8px; }
-.nav-links { display:flex; align-items:center; gap:4px; }
-.nav-links a { color:var(--muted); text-decoration:none; font-size:14px; padding:6px 14px; border-radius:8px; transition:all .18s; }
-.nav-links a:hover,.nav-links a.active { color:var(--text); background:var(--bg3); }
-.nav-links .logout { color:var(--danger); border:1px solid color-mix(in srgb,var(--danger) 25%,transparent); margin-left:8px; }
-.nav-links .logout:hover { background:color-mix(in srgb,var(--danger) 12%,transparent); }
-.page { max-width:1280px; margin:0 auto; padding:40px 32px; animation:rise .35s ease both; }
-@keyframes rise { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
-.flashes { margin-bottom:20px; }
-.flash { padding:12px 18px; border-radius:var(--radius); font-size:14px; margin-bottom:8px; }
-.flash.success { background:color-mix(in srgb,var(--success) 14%,transparent); border:1px solid color-mix(in srgb,var(--success) 28%,transparent); color:var(--success); }
-.flash.error   { background:color-mix(in srgb,var(--danger) 14%,transparent); border:1px solid color-mix(in srgb,var(--danger) 28%,transparent); color:var(--danger); }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | StockLedger</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #f4f6f8; color: #111111; overflow-x: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; height: calc(100vh - 2rem); position: fixed; top: 1rem; left: 1rem; background: #ffffff; border-radius: 24px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; padding: 2rem 1.25rem; border: 1px solid rgba(0,0,0,0.02); z-index: 1000; }
+        .brand-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.04); padding-left: 0.5rem; }
+        .user-profile { text-align: center; margin-bottom: 2.5rem; }
+        .user-avatar { width: 56px; height: 56px; border-radius: 18px; background-color: #f1f3f5; color: #111; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; margin: 0 auto 1rem auto; }
+        .nav-link { color: #6c757d; font-weight: 500; padding: 0.8rem 1rem; border-radius: 14px; margin-bottom: 0.35rem; transition: all 0.25s ease; display: flex; align-items: center; gap: 12px; }
+        .nav-link svg { color: #adb5bd; transition: all 0.25s ease; }
+        .nav-link:hover { background-color: #f8f9fa; color: #111; }
+        .nav-link:hover svg { color: #111; }
+        .nav-link.active { background-color: #111111; color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        .nav-link.active svg { color: #ffffff; }
+        .nav-logout { background-color: #fff0f0; color: #e53e3e; font-weight: 600; }
+        .nav-logout svg { color: #e53e3e; }
+        .nav-logout:hover { background-color: #fee2e2; color: #c53030; }
 
-.page-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
-.page-header h1 { font-size:24px; font-weight:600; }
-.btn { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:var(--radius); border:none; font-family:var(--font); font-size:14px; font-weight:500; cursor:pointer; text-decoration:none; transition:all .18s; }
-.btn-primary { background:var(--accent); color:#0d0f14; }
-.btn-primary:hover { background:var(--accent2); transform:translateY(-1px); }
+        /* Main & Layout */
+        .main-content { margin-left: calc(260px + 2rem); padding: 2.5rem 2.5rem 2rem 0; min-height: 100vh; }
+        .glass-card { background: #ffffff; border-radius: 28px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03); padding: 1.5rem 2.25rem; border: 1px solid rgba(0,0,0,0.02); margin-bottom: 2rem; }
+        
+        /* Buttons & Inputs */
+        .curvy-btn { background-color: #000000; color: #ffffff; border-radius: 14px; padding: 0.8rem 1.5rem; font-weight: 600; letter-spacing: 0.02em; border: none; transition: all 0.25s ease; text-decoration: none; display: inline-block;}
+        .curvy-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); background-color: #1a1a1a; color: white;}
+        .curvy-input { border-radius: 12px; background-color: #f8f9fa; border: 2px solid transparent; padding: 0.6rem 1rem; color: #111; font-weight: 500; transition: all 0.25s ease; font-size: 0.9rem;}
+        .curvy-input:focus { background-color: #ffffff; border-color: #000000; outline: none; }
+        
+        /* Table Styles */
+        .table-responsive { border-radius: 20px; overflow: hidden; border: 1px solid #f1f3f5; }
+        .table { margin-bottom: 0; }
+        .table thead th { background-color: #f8f9fa; color: #6c757d; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; padding: 1.2rem 1rem; border-bottom: none; }
+        .table tbody td { padding: 1.2rem 1rem; vertical-align: middle; font-size: 0.95rem; border-bottom: 1px solid #f1f3f5; }
+        .table tbody tr:hover { background-color: #fcfcfd; }
+        .action-link { font-weight: 600; font-size: 0.85rem; padding: 0.4rem 0.8rem; border-radius: 8px; text-decoration: none; transition: all 0.2s; background-color: #f8f9fa; color: #111; margin-right: 4px;}
+        .action-link:hover { background-color: #e9ecef; }
+        .action-link.delete { color: #ef4444; background-color: #fee2e2; }
+        .action-link.delete:hover { background-color: #fecaca; }
 
-/* FILTER BAR */
-.filter-bar {
-    background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-lg);
-    padding:18px 22px; margin-bottom:20px;
-    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-}
-.filter-bar input, .filter-bar select {
-    padding:8px 12px; background:var(--bg3); border:1px solid var(--border2);
-    border-radius:var(--radius); color:var(--text); font-family:var(--font); font-size:13px;
-    transition:border-color .18s;
-}
-.filter-bar input:focus, .filter-bar select:focus { outline:none; border-color:var(--accent); }
-.filter-bar input::placeholder { color:var(--muted); }
-.filter-bar select option { background:var(--bg2); }
-.filter-bar input[name=q] { min-width:200px; }
-.btn-filter { padding:8px 16px; background:var(--accent); color:#0d0f14; border:none; border-radius:var(--radius); font-family:var(--font); font-size:13px; font-weight:500; cursor:pointer; transition:all .18s; }
-.btn-filter:hover { background:var(--accent2); }
-.btn-reset { padding:8px 14px; background:transparent; color:var(--muted); border:1px solid var(--border2); border-radius:var(--radius); font-family:var(--font); font-size:13px; cursor:pointer; text-decoration:none; transition:all .18s; }
-.btn-reset:hover { color:var(--text); border-color:var(--muted); }
-.filter-sep { color:var(--border2); margin:0 4px; }
-
-/* TABLE */
-.table-wrap { overflow-x:auto; border-radius:var(--radius-lg); border:1px solid var(--border); background:var(--bg2); }
-table { width:100%; border-collapse:collapse; }
-thead tr { border-bottom:1px solid var(--border); }
-thead th { padding:13px 16px; font-size:11px; font-weight:500; color:var(--muted); text-transform:uppercase; letter-spacing:.07em; text-align:left; white-space:nowrap; background:var(--bg2); }
-tbody tr { border-bottom:1px solid var(--border); transition:background .15s; }
-tbody tr:last-child { border-bottom:none; }
-tbody tr:hover { background:var(--bg3); }
-tbody td { padding:14px 16px; font-size:14px; color:var(--text); }
-.mono { font-family:var(--mono); font-size:13px; }
-.badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:500; }
-.badge-low  { background:color-mix(in srgb,var(--danger) 14%,transparent); border:1px solid color-mix(in srgb,var(--danger) 28%,transparent); color:var(--danger); }
-.badge-ok   { background:color-mix(in srgb,var(--success) 14%,transparent); border:1px solid color-mix(in srgb,var(--success) 28%,transparent); color:var(--success); }
-.actions { display:flex; align-items:center; gap:6px; }
-.action-link { font-size:13px; color:var(--muted); text-decoration:none; padding:5px 10px; border-radius:7px; border:1px solid transparent; transition:all .15s; }
-.action-link:hover { color:var(--accent); border-color:color-mix(in srgb,var(--accent) 30%,transparent); background:color-mix(in srgb,var(--accent) 8%,transparent); }
-.action-link.del:hover { color:var(--danger); border-color:color-mix(in srgb,var(--danger) 30%,transparent); background:color-mix(in srgb,var(--danger) 8%,transparent); }
-.empty-row td { text-align:center; padding:60px 16px; color:var(--muted); font-size:14px; }
-
-/* PAGINATION */
-.pagination { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:24px; }
-.pagination a { padding:7px 14px; background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius); font-size:13px; color:var(--muted); text-decoration:none; transition:all .15s; }
-.pagination a:hover { color:var(--text); border-color:var(--accent); }
-.pagination .current { padding:7px 14px; background:var(--accent); color:#0d0f14; border-radius:var(--radius); font-size:13px; font-weight:500; }
-.pagination .sep { color:var(--muted); }
-
-footer { text-align:center; color:var(--muted); font-size:13px; padding:40px 0 24px; }
-</style>
+        /* Badges */
+        .status-pill { padding: 0.4rem 0.8rem; border-radius: 10px; font-weight: 600; font-size: 0.75rem; }
+        .pill-ok { background-color: #d1fae5; color: #059669; }
+        .pill-low { background-color: #fee2e2; color: #ef4444; }
+        
+        .minimal-alert { border-radius: 12px; border: none; background-color: #d1fae5; color: #065f46; }
+        
+        /* Pagination */
+        .pagination a { padding: 0.6rem 1rem; border-radius: 10px; font-weight: 600; font-size: 0.9rem; color: #111; text-decoration: none; background-color: #f8f9fa; transition: all 0.2s; }
+        .pagination a:hover { background-color: #e9ecef; }
+        .pagination .current { padding: 0.6rem 1rem; border-radius: 10px; font-weight: 600; font-size: 0.9rem; background-color: #111; color: white; }
+    </style>
 </head>
 <body>
-<nav class="nav">
-    <div class="nav-brand">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".25"/></svg>
-        StockLedger
-        <a href="https://portfolio-alpha-jade-83.vercel.app/" target="_blank" style="font-size: 12px; padding: 4px 10px; background: var(--accent); color: #0d0f14; border-radius: 6px; text-decoration: none; font-weight: 600; margin-left: 10px;">My Portfolio</a>
-    </div>
-    <div class="nav-links">
-        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('products') }}" class="active">Products</a>
-        <a href="{{ url_for('add_product') }}">Add Product</a>
-        <a href="{{ url_for('sell_product') }}">Sell</a>
-        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
-    </div>
-</nav>
 
-<div class="page">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}<div class="flashes">{% for c,m in messages %}<div class="flash {{c}}">{{m}}</div>{% endfor %}</div>{% endif %}
-    {% endwith %}
-
-    <div class="page-header">
-        <h1>Products</h1>
-        <a href="{{ url_for('add_product') }}" class="btn btn-primary">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            Add Product
-        </a>
-    </div>
-
-    <form method="GET">
-        <div class="filter-bar">
-            <input type="text" name="q" placeholder="Search by name or category..." value="{{ search }}">
-            <select name="category">
-                <option value="">All categories</option>
-                {% for cat in categories %}
-                    <option value="{{ cat.category }}" {% if category == cat.category %}selected{% endif %}>{{ cat.category }}</option>
-                {% endfor %}
-            </select>
-            <input type="number" name="min_price" placeholder="Min ₹" value="{{ min_price }}" style="width:90px;">
-            <input type="number" name="max_price" placeholder="Max ₹" value="{{ max_price }}" style="width:90px;">
-            <select name="sort">
-                <option value="" {% if sort=='' %}selected{% endif %}>Newest first</option>
-                <option value="price_asc"  {% if sort=='price_asc'  %}selected{% endif %}>Price: low to high</option>
-                <option value="price_desc" {% if sort=='price_desc' %}selected{% endif %}>Price: high to low</option>
-                <option value="qty_asc"    {% if sort=='qty_asc'    %}selected{% endif %}>Qty: low to high</option>
-                <option value="qty_desc"   {% if sort=='qty_desc'   %}selected{% endif %}>Qty: high to low</option>
-            </select>
-            <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap;">
-                <input type="checkbox" name="low_stock" value="1" {% if low_stock %}checked{% endif %} style="accent-color:var(--danger);width:auto;"> Low stock only
-            </label>
-            <button type="submit" class="btn-filter">Apply</button>
-            <a href="{{ url_for('products') }}" class="btn-reset">Clear</a>
+    <nav class="sidebar">
+        <div class="brand-header">
+            <svg width="22" height="22" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="#111111"/><rect x="11" y="2" width="7" height="7" rx="2" fill="#111111" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="#111111" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="#111111" opacity=".25"/></svg>
+            <span class="fw-bold fs-5" style="letter-spacing: -0.02em;">StockLedger</span>
         </div>
-    </form>
+        <div class="user-profile">
+            <div class="user-avatar">{{ session['user'][0]|upper if session.get('user') else 'U' }}</div>
+            <h5 class="fw-bold mb-0 text-truncate">{{ session.get('user', 'User') }}</h5>
+            <small class="text-muted">Administrator</small>
+        </div>
+        <ul class="nav flex-column flex-grow-1">
+            <li class="nav-item"><a href="{{ url_for('dashboard') }}" class="nav-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>Dashboard</a></li>
+            <li class="nav-item"><a href="{{ url_for('products') }}" class="nav-link active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>Products</a></li>
+            <li class="nav-item"><a href="{{ url_for('add_product') }}" class="nav-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>Add Products</a></li>
+            <li class="nav-item"><a href="{{ url_for('sell_product') }}" class="nav-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>Sell Products</a></li>
+            <li class="nav-item"><a href="{{ url_for('sales_report') }}" class="nav-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>Reports</a></li>
+        </ul>
+        <div class="mt-auto"><a href="{{ url_for('logout') }}" class="nav-link nav-logout d-flex align-items-center justify-content-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>Logout</a></div>
+    </nav>
 
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Unit</th>
-                    <th>Net Wt.</th>
-                    <th>Quantity</th>
-                    <th>Purchase ₹</th>
-                    <th>Selling ₹</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if products %}
-                    {% for product in products %}
-                    <tr>
-                        <td class="mono" style="color:var(--muted);">{{ loop.index + (page-1)*10 }}</td>
-                        <td style="font-weight:500;">{{ product.name }}</td>
-                        <td style="color:var(--muted);">{{ product.category }}</td>
-                        <td class="mono">{{ product.unit }}</td>
-                        <td class="mono">{{ product.net_weight }}</td>
-                        <td class="mono">{{ product.quantity }}</td>
-                        <td class="mono">₹{{ product.purchase_price }}</td>
-                        <td class="mono" style="color:var(--accent);">₹{{ product.selling_price }}</td>
-                        <td>
-                            {% if product.quantity <= product.min_stock %}
-                                <span class="badge badge-low">Low stock</span>
-                            {% else %}
-                                <span class="badge badge-ok">In stock</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="actions">
-                                <a href="{{ url_for('edit_product', id=product.id) }}" class="action-link">Edit</a>
-                                <form method="POST" action="{{ url_for('delete_product', id=product.id) }}" style="display:inline;" onsubmit="return confirm('Delete {{ product.name }}? This cannot be undone.')">
-                                    <button type="submit" class="action-link del" style="background:none;border:1px solid transparent;font-family:inherit;cursor:pointer;">Delete</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
+    <main class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="fw-bold mb-0 text-dark tracking-tight" style="letter-spacing: -0.03em;">Inventory Hub</h2>
+            <a href="{{ url_for('add_product') }}" class="curvy-btn text-decoration-none">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add Product
+            </a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert minimal-alert py-3 px-4 fw-medium mb-4">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Filter Bar -->
+        <div class="glass-card mb-4" style="padding: 1.25rem 2rem;">
+            <form method="GET" class="d-flex gap-3 align-items-center flex-wrap">
+                <input type="text" name="q" class="curvy-input" placeholder="Search name/category..." value="{{ search }}" style="flex: 1; min-width: 200px;">
+                <select name="category" class="curvy-input" style="width: auto;">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.category }}" {% if category == cat.category %}selected{% endif %}>{{ cat.category }}</option>
                     {% endfor %}
-                {% else %}
-                    <tr class="empty-row"><td colspan="10">No products found matching your filters</td></tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
+                </select>
+                <input type="number" name="min_price" class="curvy-input" placeholder="Min ₹" value="{{ min_price }}" style="width: 100px;">
+                <input type="number" name="max_price" class="curvy-input" placeholder="Max ₹" value="{{ max_price }}" style="width: 100px;">
+                <select name="sort" class="curvy-input" style="width: auto;">
+                    <option value="" {% if sort=='' %}selected{% endif %}>Sort by Newest</option>
+                    <option value="price_asc" {% if sort=='price_asc' %}selected{% endif %}>Price: Low → High</option>
+                    <option value="price_desc" {% if sort=='price_desc' %}selected{% endif %}>Price: High → Low</option>
+                    <option value="qty_asc" {% if sort=='qty_asc' %}selected{% endif %}>Qty: Low → High</option>
+                    <option value="qty_desc" {% if sort=='qty_desc' %}selected{% endif %}>Qty: High → Low</option>
+                </select>
+                
+                <label class="d-flex align-items-center gap-2 fw-medium text-muted small" style="cursor: pointer;">
+                    <input type="checkbox" name="low_stock" value="1" {% if low_stock %}checked{% endif %} style="width: 18px; height: 18px; accent-color: #111;">
+                    Low Stock
+                </label>
+                
+                <div class="d-flex gap-2 ms-auto">
+                    <a href="{{ url_for('products') }}" class="btn text-muted fw-bold" style="padding: 0.6rem 1rem;">Clear</a>
+                    <button type="submit" class="curvy-btn" style="padding: 0.6rem 1.5rem;">Apply</button>
+                </div>
+            </form>
+        </div>
 
-    {% if total_pages > 1 %}
-    <div class="pagination">
-        {% if page > 1 %}
-            <a href="?page={{ page-1 }}&q={{ search }}&category={{ category }}&sort={{ sort }}">← Prev</a>
-        {% endif %}
-        <span class="current">{{ page }} / {{ total_pages }}</span>
-        {% if page < total_pages %}
-            <a href="?page={{ page+1 }}&q={{ search }}&category={{ category }}&sort={{ sort }}">Next →</a>
-        {% endif %}
-    </div>
-    {% endif %}
-</div>
+        <!-- Table -->
+        <div class="glass-card p-0">
+            <div class="table-responsive">
+                <table class="table table-borderless">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Product Details</th>
+                            <th>Stock</th>
+                            <th>Purchase</th>
+                            <th>Selling</th>
+                            <th>Status</th>
+                            <th class="pe-4 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if products %}
+                            {% for product in products %}
+                            <tr>
+                                <td class="text-muted fw-bold ps-4">#{{ product.id }}</td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ product.name }}</div>
+                                    <small class="text-muted">{{ product.category }} • {{ product.net_weight }}{{ product.unit }}</small>
+                                </td>
+                                <td class="fw-bold fs-6">{{ product.quantity }}</td>
+                                <td class="text-muted fw-medium">₹{{ product.purchase_price }}</td>
+                                <td class="fw-bold" style="color: #10b981;">₹{{ product.selling_price }}</td>
+                                <td>
+                                    {% if product.quantity <= product.min_stock %}
+                                        <span class="status-pill pill-low">Low Stock</span>
+                                    {% else %}
+                                        <span class="status-pill pill-ok">Healthy</span>
+                                    {% endif %}
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <div class="d-flex justify-content-end align-items-center">
+                                        <a href="{{ url_for('edit_product', id=product.id) }}" class="action-link">Edit</a>
+                                        <form method="POST" action="{{ url_for('delete_product', id=product.id) }}" class="m-0 p-0" onsubmit="return confirm('Delete {{ product.name }}? This cannot be undone.')">
+                                            <button type="submit" class="action-link delete border-0">Drop</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted fw-medium">No products found matching your filters.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-<footer>StockLedger © 2026 — Inventory Management System By Naga Satya Teja Yerroju</footer>
+        {% if total_pages > 1 %}
+        <div class="pagination d-flex justify-content-center gap-2 mt-4">
+            {% if page > 1 %}
+                <a href="?page={{ page-1 }}&q={{ search }}&category={{ category }}&sort={{ sort }}">← Prev</a>
+            {% endif %}
+            <span class="current">{{ page }} / {{ total_pages }}</span>
+            {% if page < total_pages %}
+                <a href="?page={{ page+1 }}&q={{ search }}&category={{ category }}&sort={{ sort }}">Next →</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </main>
 </body>
 </html>
