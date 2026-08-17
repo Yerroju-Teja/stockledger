@@ -1,152 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %} | StockLedger</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Bootstrap 5.3.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root {
-            --bg:        #0d0f14;
-            --bg2:       #13161e;
-            --bg3:       #1a1e2a;
-            --border:    #252a38;
-            --border2:   #2e3449;
-            --text:      #e8eaf0;
-            --muted:     #7a8199;
-            --accent:    #f0a500;
-            --accent2:   #f7c948;
-            --danger:    #e05c5c;
-            --success:   #3fcb7f;
-            --info:      #5b8dee;
-            --font:      'DM Sans', sans-serif;
-            --mono:      'DM Mono', monospace;
-            --radius:    10px;
-            --radius-lg: 16px;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:15px; line-height:1.6; min-height:100vh; }
-
-        /* NAV */
-        .nav {
-            position:sticky; top:0; z-index:100;
-            background:var(--bg2);
-            border-bottom:1px solid var(--border);
-            padding:0 32px;
-            display:flex; align-items:center; justify-content:space-between;
-            height:60px;
-        }
-        .nav-brand { font-size:16px; font-weight:600; color:var(--accent); letter-spacing:0.02em; display:flex; align-items:center; gap:8px; }
-        .nav-brand svg { opacity:.9; }
-        .nav-links { display:flex; align-items:center; gap:4px; }
-        .nav-links a {
-            color:var(--muted); text-decoration:none; font-size:14px; font-weight:400;
-            padding:6px 14px; border-radius:8px; transition:all .18s;
-        }
-        .nav-links a:hover { color:var(--text); background:var(--bg3); }
-        .nav-links a.active { color:var(--text); background:var(--bg3); }
-        .nav-links .btn-logout {
-            color:var(--danger); border:1px solid color-mix(in srgb, var(--danger) 30%, transparent);
-            margin-left:8px;
-        }
-        .nav-links .btn-logout:hover { background:color-mix(in srgb, var(--danger) 12%, transparent); }
-
-        /* PAGE SHELL */
-        .page { max-width:1280px; margin:0 auto; padding:40px 32px; }
-
-        /* CARDS */
-        .card {
-            background:var(--bg2); border:1px solid var(--border);
-            border-radius:var(--radius-lg); padding:28px;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f6f8; 
+            color: #111111;
+            overflow-x: hidden;
         }
 
-        /* FLASH */
-        .flashes { margin-bottom:20px; }
-        .flash { padding:12px 18px; border-radius:var(--radius); font-size:14px; margin-bottom:8px; }
-        .flash.success { background:color-mix(in srgb,var(--success) 15%,transparent); border:1px solid color-mix(in srgb,var(--success) 35%,transparent); color:var(--success); }
-        .flash.error   { background:color-mix(in srgb,var(--danger) 15%,transparent);  border:1px solid color-mix(in srgb,var(--danger) 35%,transparent);  color:var(--danger);  }
-
-        /* BUTTONS */
-        .btn { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:var(--radius); border:none; font-family:var(--font); font-size:14px; font-weight:500; cursor:pointer; text-decoration:none; transition:all .18s; }
-        .btn-primary { background:var(--accent); color:#0d0f14; }
-        .btn-primary:hover { background:var(--accent2); transform:translateY(-1px); }
-        .btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border2); }
-        .btn-ghost:hover { color:var(--text); border-color:var(--muted); background:var(--bg3); }
-        .btn-danger-soft { background:color-mix(in srgb,var(--danger) 12%,transparent); color:var(--danger); border:1px solid color-mix(in srgb,var(--danger) 30%,transparent); }
-        .btn-danger-soft:hover { background:color-mix(in srgb,var(--danger) 22%,transparent); }
-        .btn-sm { padding:6px 13px; font-size:13px; }
-
-        /* FORM ELEMENTS */
-        .form-group { margin-bottom:20px; }
-        .form-label { display:block; font-size:13px; font-weight:500; color:var(--muted); margin-bottom:7px; letter-spacing:0.02em; }
-        .form-input, .form-select {
-            width:100%; padding:11px 14px;
-            background:var(--bg3); border:1px solid var(--border2);
-            border-radius:var(--radius); color:var(--text); font-family:var(--font); font-size:14px;
-            transition:border-color .18s, box-shadow .18s;
+        /* --- Floating Curvy Sidebar --- */
+        .sidebar {
+            width: 260px; height: calc(100vh - 2rem); position: fixed; top: 1rem; left: 1rem;
+            background: #ffffff; border-radius: 24px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            display: flex; flex-direction: column; padding: 2rem 1.25rem; border: 1px solid rgba(0,0,0,0.02); z-index: 1000;
         }
-        .form-input:focus, .form-select:focus {
-            outline:none; border-color:var(--accent);
-            box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent);
+
+        .brand-header {
+            display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.04); padding-left: 0.5rem;
         }
-        .form-select option { background:var(--bg2); }
 
-        /* TABLE */
-        .table-wrap { overflow-x:auto; border-radius:var(--radius-lg); border:1px solid var(--border); }
-        table { width:100%; border-collapse:collapse; }
-        thead tr { border-bottom:1px solid var(--border); }
-        thead th { padding:13px 16px; font-size:12px; font-weight:500; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; text-align:left; white-space:nowrap; }
-        tbody tr { border-bottom:1px solid var(--border); transition:background .15s; }
-        tbody tr:last-child { border-bottom:none; }
-        tbody tr:hover { background:var(--bg3); }
-        tbody td { padding:14px 16px; font-size:14px; color:var(--text); }
+        .user-profile { text-align: center; margin-bottom: 2.5rem; }
+        
+        .user-avatar {
+            width: 56px; height: 56px; border-radius: 18px; background-color: #f1f3f5; color: #111;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; margin: 0 auto 1rem auto;
+        }
 
-        /* BADGES */
-        .badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:500; }
-        .badge-low  { background:color-mix(in srgb,var(--danger) 15%,transparent);  color:var(--danger); }
-        .badge-ok   { background:color-mix(in srgb,var(--success) 15%,transparent); color:var(--success); }
-        .badge-warn { background:color-mix(in srgb,var(--accent) 15%,transparent);  color:var(--accent); }
+        .nav-link {
+            color: #6c757d; font-weight: 500; padding: 0.8rem 1rem; border-radius: 14px;
+            margin-bottom: 0.35rem; transition: all 0.25s ease; display: flex; align-items: center; gap: 12px;
+        }
 
-        /* PAGE HEADER */
-        .page-heading { font-size:24px; font-weight:600; color:var(--text); }
-        .page-sub { font-size:14px; color:var(--muted); margin-top:4px; }
+        .nav-link svg { color: #adb5bd; transition: all 0.25s ease; }
+        .nav-link:hover { background-color: #f8f9fa; color: #111; }
+        .nav-link:hover svg { color: #111; }
+        .nav-link.active { background-color: #111111; color: #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        .nav-link.active svg { color: #ffffff; }
 
-        /* GRID */
-        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-        .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
-        .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
-        @media(max-width:900px) { .grid-4,.grid-3 { grid-template-columns:1fr 1fr; } }
-        @media(max-width:600px) { .grid-2,.grid-4,.grid-3 { grid-template-columns:1fr; } }
+        .nav-logout { background-color: #fff0f0; color: #e53e3e; font-weight: 600; margin-top: auto; }
+        .nav-logout svg { color: #e53e3e; }
+        .nav-logout:hover { background-color: #fee2e2; color: #c53030; }
 
-        /* MISC */
-        .text-muted  { color:var(--muted); }
-        .text-accent { color:var(--accent); }
-        .text-danger { color:var(--danger); }
-        .text-success{ color:var(--success); }
-        .mono        { font-family:var(--mono); }
-        .divider     { border:none; border-top:1px solid var(--border); margin:24px 0; }
-        footer.foot  { text-align:center; color:var(--muted); font-size:13px; padding:40px 0 24px; }
+        /* --- Main Content Area --- */
+        .main-content {
+            margin-left: calc(260px + 2rem); padding: 2.5rem 2.5rem 2rem 0; min-height: 100vh;
+        }
+
+        /* --- Shared Glass Cards --- */
+        .glass-card {
+            background: #ffffff; border-radius: 28px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            padding: 2.25rem; border: 1px solid rgba(0,0,0,0.02); margin-bottom: 2rem;
+        }
+
+        /* --- Shared Inputs/Buttons --- */
+        .curvy-input { border-radius: 12px; background-color: #f8f9fa; border: 2px solid transparent; padding: 0.6rem 1rem; color: #111; font-weight: 500; transition: all 0.25s ease; font-size: 0.9rem;}
+        .curvy-input:focus { background-color: #ffffff; border-color: #000000; outline: none; }
+        .curvy-btn { background-color: #000000; color: #ffffff; border-radius: 14px; padding: 0.8rem 1.5rem; font-weight: 600; letter-spacing: 0.02em; border: none; transition: all 0.25s ease; text-decoration: none; display: inline-block;}
+        .curvy-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); background-color: #1a1a1a; color: white;}
     </style>
 </head>
 <body>
-    <nav class="nav">
-        <div class="nav-brand">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="2" fill="currentColor" opacity=".25"/></svg>
-            StockLedger
-            <a href="https://portfolio-alpha-jade-83.vercel.app/" target="_blank" style="font-size: 12px; padding: 4px 10px; background: var(--accent); color: #0d0f14; border-radius: 6px; text-decoration: none; font-weight: 600; margin-left: 10px;">My Portfolio</a>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <!-- Project Branding -->
+        <div class="brand-header">
+            <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+                <rect x="2" y="2" width="7" height="7" rx="2" fill="#111111"/>
+                <rect x="11" y="2" width="7" height="7" rx="2" fill="#111111" opacity=".5"/>
+                <rect x="2" y="11" width="7" height="7" rx="2" fill="#111111" opacity=".5"/>
+                <rect x="11" y="11" width="7" height="7" rx="2" fill="#111111" opacity=".25"/>
+            </svg>
+            <span class="fw-bold fs-5" style="letter-spacing: -0.02em;">StockLedger</span>
         </div>
-        <div class="nav-links">
-            <a href="{{ url_for('dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('products') }}">Products</a>
-            <a href="{{ url_for('add_product') }}">Add Product</a>
-            <a href="{{ url_for('sell_product') }}">Sell</a>
-            <a href="{{ url_for('sales_report') }}">Reports</a>
-            <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+
+        <div class="user-profile">
+            <!-- Initial of user name for avatar -->
+            <div class="user-avatar">{{ session['user'][0]|upper if session.get('user') else 'U' }}</div>
+            <h5 class="fw-bold mb-0 text-truncate">{{ session.get('user', 'User') }}</h5>
+            <small class="text-muted">Administrator</small>
         </div>
+
+        <ul class="nav flex-column flex-grow-1">
+            <li class="nav-item">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('products') }}" class="nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('add_product') }}" class="nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                    Add Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('sell_product') }}" class="nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    Sell Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('sales_report') }}" class="nav-link">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    Reports
+                </a>
+            </li>
+        </ul>
+
+        <a href="{{ url_for('logout') }}" class="nav-link nav-logout d-flex align-items-center justify-content-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            Logout
+        </a>
     </nav>
-    <div class="main-container">
+
+    <!-- MAIN CONTENT INJECTED HERE -->
+    <main class="main-content">
         {% block content %}{% endblock %}
-    </div>
+    </main>
+
 </body>
 </html>
